@@ -6,6 +6,17 @@ using System.Collections.Generic;
 namespace KerbalSorter
 {
     [KSPAddon(KSPAddon.Startup.SpaceCentre, false)]
+    public class SpaceCentreHook : MonoBehaviour
+    {
+        private void Start() { gameObject.AddComponent<ACRosterReplacer>(); }
+    }
+
+    [KSPAddon(KSPAddon.Startup.EditorAny, false)]
+    public class EditorHook : SpaceCentreHook
+    {
+    }
+
+    //[KSPAddon(KSPAddon.Startup.SpaceCentre, false)]
     public class ACRosterReplacer : MonoBehaviour
     {
         static CMAstronautComplex complex;
@@ -27,6 +38,12 @@ namespace KerbalSorter
                 Debug.LogError("KerbalSorter: Encountered unhandled exception: " + e);
                 Destroy(this);
             }
+        }
+
+        void OnDestroy()
+        {
+            GameEvents.onGUIAstronautComplexSpawn.Remove(OnACSpawn);
+            GameEvents.onGUIAstronautComplexDespawn.Remove(OnACDespawn);
         }
 
         private void OnACSpawn(){
