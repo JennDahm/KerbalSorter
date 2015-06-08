@@ -49,7 +49,10 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="ACRosterReplacer.cs" />
+    <Compile Include="Hooks\AstronautComplexHook.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="SortingButtons.cs" />
+    <Compile Include="SortingInterface.cs" />
   </ItemGroup>
   <ItemGroup>
     <Content Include="Standard Test Button Code.txt" />
