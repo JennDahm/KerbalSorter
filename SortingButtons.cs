@@ -47,7 +47,8 @@ namespace KerbalSorter
             }
 
             Texture buttonIcon = GameDatabase.Instance.GetTexture("KerbalSorter/Images/" + (expanded?"SortBtnIn":"SortBtnOut"), false);
-            bool masterPressed = GUI.Button(new Rect(x,y , 25,25), buttonIcon, buttonStyle);
+            string hoverText = "Sorting Options";
+            bool masterPressed = GUI.Button(new Rect(x,y , 25,25), new GUIContent(buttonIcon, hoverText), buttonStyle);
 
             // Draw the sorting buttons.
             if( expanded ){
@@ -55,7 +56,8 @@ namespace KerbalSorter
 
                 for( int i = 0; i < buttons.Length; i++ ){
                     buttonIcon = GameDatabase.Instance.GetTexture(buttons[i].iconLocs[buttonStates[i]], false);
-                    bool pressed = GUI.Button(new Rect(nextX,y , 25,25), buttonIcon, buttonStyle);
+                    hoverText = buttons[i].hoverText[buttonStates[i]];
+                    bool pressed = GUI.Button(new Rect(nextX,y , 25,25), new GUIContent(buttonIcon,hoverText), buttonStyle);
                     if( pressed ){
                         buttonStates[i] = (buttonStates[i]+1) % buttons[i].numStates;
                     }
