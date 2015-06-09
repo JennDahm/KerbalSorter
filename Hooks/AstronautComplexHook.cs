@@ -7,8 +7,7 @@ using System.Collections.Generic;
 namespace KerbalSorter.Hooks
 {
     [KSPAddon(KSPAddon.Startup.SpaceCentre, false)]
-    public class AstronautComplexHook : MonoBehaviour
-    {
+    public class AstronautComplexHook : MonoBehaviour {
         CMAstronautComplex complex;
         SortingButtons sortBar;
         Roster<IUIListObject> available;
@@ -27,21 +26,6 @@ namespace KerbalSorter.Hooks
                 //UIScrollList availableCrew = complex.transform.Find("CrewPanels/panel_enlisted/panelManager/panel_available/scrolllist_available").GetComponent<UIScrollList>();
                 //UIScrollList assignedCrew = complex.transform.Find("CrewPanels/panel_enlisted/panelManager/panel_assigned/scrolllist_assigned").GetComponent<UIScrollList>();
                 //UIScrollList killedCrew = complex.transform.Find("CrewPanels/panel_enlisted/panelManager/panel_kia/scrolllist_kia").GetComponent<UIScrollList>();
-                
-                // Get position:
-                Transform targetTabTrans = complex.transform.Find("CrewPanels/panel_enlisted/tabs/tab_kia");
-                BTPanelTab targetTab = targetTabTrans.GetComponent<BTPanelTab>();
-                var uiCams = UIManager.instance.uiCameras;
-                EZCameraSettings uiCam = null;
-                for( int i = 0; i < uiCams.Length; i++ ){
-                    if( (uiCams[i].mask & (1 << targetTabTrans.gameObject.layer)) != 0 ){
-                        uiCam = uiCams[i];
-                        break;
-                    }
-                }
-                Vector3 screenPos = uiCam.camera.WorldToScreenPoint(targetTabTrans.position);
-                float x = screenPos.x+targetTab.width+5;
-                float y = Screen.height - screenPos.y - 1;
 
                 // Set up button list:
                 SortButtonDef[] buttons = new SortButtonDef[]{ StandardButtonDefs.ByName,
@@ -52,7 +36,6 @@ namespace KerbalSorter.Hooks
                 sortBar = gameObject.AddComponent<SortingButtons>();
                 //sortBar.SetRoster(available);
                 sortBar.SetButtons(buttons);
-                sortBar.SetPos(x,y);
                 sortBar.enabled = false;
             } catch( Exception e ){
                 Debug.Log("KerbalSorter: Unexpected error in AstronautComplex Hook: " + e);
@@ -60,21 +43,25 @@ namespace KerbalSorter.Hooks
         }
 
 
-        protected void OnACSpawn(){
+        protected void OnACSpawn() {
+            // Set position:
+            Transform targetTabTrans = complex.transform.Find("CrewPanels/panel_enlisted/tabs/tab_kia");
+            BTPanelTab targetTab = targetTabTrans.GetComponent<BTPanelTab>();
+            Vector3 screenPos = Utilities.GetPosition(targetTabTrans);
+            float x = screenPos.x+targetTab.width+5;
+            float y = screenPos.y - 1;
+            sortBar.SetPos(x,y);
+
             sortBar.enabled = true;
         }
 
-        protected void OnACDespawn(){
+        protected void OnACDespawn() {
             sortBar.enabled = false;
         }
 
-        protected void OnDestroy(){
+        protected void OnDestroy() {
             GameEvents.onGUIAstronautComplexSpawn.Remove(OnACSpawn);
             GameEvents.onGUIAstronautComplexDespawn.Remove(OnACDespawn);
-        }
-
-        protected void OnGUI(){
-            // Set sort bar position
         }
     }
 

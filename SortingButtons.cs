@@ -6,8 +6,7 @@ using System.Collections.Generic;
 namespace KerbalSorter
 {
     // Unity apparently doesn't like generics, which would be very useful here. Way to go, Unity.
-    public class SortingButtons : MonoBehaviour
-    {
+    public class SortingButtons : MonoBehaviour {
         private Roster<IUIListObject> roster = null;
         private SortButtonDef[] buttons = new SortButtonDef[0];
         private int[] buttonStates = new int[0];
@@ -19,27 +18,27 @@ namespace KerbalSorter
         bool expanded = false;
 
         // Apparently we can't use constructors in Unity, so we'll have to deal with it this way:
-        public void SetRoster(Roster<IUIListObject> roster){
+        public void SetRoster(Roster<IUIListObject> roster) {
             this.roster = roster;
         }
-        public void SetButtons(SortButtonDef[] buttons){
+        public void SetButtons(SortButtonDef[] buttons) {
             this.buttons = buttons;
             this.buttonStates = new int[buttons.Length];
         }
-        public void SetPos(float x, float y){
+        public void SetPos(float x, float y) {
             this.x = x;
             this.y = y;
         }
 
 
-        protected void OnEnable(){
+        protected void OnEnable() {
         }
-        protected void OnDisable(){
+        protected void OnDisable() {
             expanded = false;
         }
 
 
-        protected void OnGUI(){
+        protected void OnGUI() {
             if( !skinSetup ){
                 buttonStyle = new GUIStyle(HighLogic.Skin.button);
                 buttonStyle.padding = new RectOffset(4,4,4,4);
