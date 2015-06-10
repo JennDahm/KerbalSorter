@@ -17,6 +17,7 @@ If you have lots of kerbals, or are simply very organized, this is the mod for y
 
 ## To-Do
 
+* Add sorting assigned and KIA crew in the Astronaut Complex
 * Add sorting by number of flights
 * Add fly-in animation to editor sort bar to match the Crew tab fly-in animation.
 * Re-sort lists when they change.
