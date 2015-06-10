@@ -85,21 +85,44 @@ namespace KerbalSorter
             return -NameAscending(a, b);
         }
 
-        static public int ClassAscending(ProtoCrewMember a, ProtoCrewMember b) {
-            return a.experienceTrait.Title.CompareTo(b.experienceTrait.Title);
+        static public int ClassEngineersFirst(ProtoCrewMember a, ProtoCrewMember b) {
+            bool aIsEng = a.experienceTrait.Title == "Engineer";
+            bool bIsEng = b.experienceTrait.Title == "Engineer";
+            if( aIsEng && bIsEng ){
+                return 0;
+            } else if( aIsEng ){
+                return -1;
+            } else if( bIsEng ){
+                return 1;
+            } else {
+                return a.experienceTrait.Title.CompareTo(b.experienceTrait.Title);
+            }
         }
-        static public int ClassDescending(ProtoCrewMember a, ProtoCrewMember b) {
-            return -ClassAscending(a, b);
+        static public int ClassPilotsFirst(ProtoCrewMember a, ProtoCrewMember b) {
+            bool aIsPil = a.experienceTrait.Title == "Pilot";
+            bool bIsPil = b.experienceTrait.Title == "Pilot";
+            if( aIsPil && bIsPil ){
+                return 0;
+            } else if( aIsPil ){
+                return -1;
+            } else if( bIsPil ){
+                return 1;
+            } else {
+                return a.experienceTrait.Title.CompareTo(b.experienceTrait.Title);
+            }
         }
-
-        static public int ClassEngineersFirst(ProtoCrewMember a, ProtoCrewMember b){
-            return 0;
-        }
-        static public int ClassPilotsFirst(ProtoCrewMember a, ProtoCrewMember b){
-            return 0;
-        }
-        static public int ClassScientistsFirst(ProtoCrewMember a, ProtoCrewMember b){
-            return 0;
+        static public int ClassScientistsFirst(ProtoCrewMember a, ProtoCrewMember b) {
+            bool aIsSci = a.experienceTrait.Title == "Scientist";
+            bool bIsSci = b.experienceTrait.Title == "Scientist";
+            if( aIsSci && bIsSci ){
+                return 0;
+            } else if( aIsSci ){
+                return -1;
+            } else if( bIsSci ){
+                return 1;
+            } else {
+                return a.experienceTrait.Title.CompareTo(b.experienceTrait.Title);
+            }
         }
 
         static public int LevelAscending(ProtoCrewMember a, ProtoCrewMember b) {
