@@ -48,7 +48,6 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="ACRosterReplacer.cs" />
     <Compile Include="Hooks\AstronautComplexHook.cs" />
     <Compile Include="Hooks\EditorHook.cs" />
     <Compile Include="Hooks\LaunchWindowHook.cs" />
