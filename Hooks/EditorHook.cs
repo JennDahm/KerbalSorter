@@ -17,22 +17,20 @@ namespace KerbalSorter.Hooks
                 // Get Roster:
                 UIScrollList[] lists = UIManager.instance.gameObject.GetComponentsInChildren<UIScrollList>(true);
                 UIScrollList availableCrew = null;
-                foreach (UIScrollList list in lists)
-                {
+                foreach( UIScrollList list in lists ){
                     if (list.name == "scrolllist_avail")
                     {
                         availableCrew = list;
                         break;
                     }
                 }
-                if (availableCrew == null)
-                {
+                if( availableCrew == null ){
                     throw new Exception("Could not find Available Crew List!");
                 }
-                //Roster available = ...
+                StockRoster available = new StockRoster(availableCrew);
 
 
-                // Set position: (This is probably the one time we actually want to do this here)
+                // Get position: (This is probably the one time we actually want to do this here)
                 Transform tab_crewavail = availableCrew.transform.parent.Find("tab_crewavail");
                 BTButton tab = tab_crewavail.GetComponent<BTButton>();
                 Vector3 tabPos = Utilities.GetPosition(tab_crewavail);
@@ -46,7 +44,7 @@ namespace KerbalSorter.Hooks
 
                 // Initialize the sort bar:
                 sortBar = gameObject.AddComponent<SortingButtons>();
-                //sortBar.SetRoster(available);
+                sortBar.SetRoster(available);
                 sortBar.SetButtons(buttons);
                 sortBar.SetPos(x, y);
                 sortBar.enabled = false;

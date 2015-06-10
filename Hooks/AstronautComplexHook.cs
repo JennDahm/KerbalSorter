@@ -23,9 +23,10 @@ namespace KerbalSorter.Hooks
                 // Get rosters:
                 complex = UIManager.instance.gameObject.GetComponentsInChildren<CMAstronautComplex>(true).FirstOrDefault();
                 if (complex == null) throw new Exception("Could not find astronaut complex");
-                //UIScrollList availableCrew = complex.transform.Find("CrewPanels/panel_enlisted/panelManager/panel_available/scrolllist_available").GetComponent<UIScrollList>();
+                UIScrollList availableCrew = complex.transform.Find("CrewPanels/panel_enlisted/panelManager/panel_available/scrolllist_available").GetComponent<UIScrollList>();
                 //UIScrollList assignedCrew = complex.transform.Find("CrewPanels/panel_enlisted/panelManager/panel_assigned/scrolllist_assigned").GetComponent<UIScrollList>();
                 //UIScrollList killedCrew = complex.transform.Find("CrewPanels/panel_enlisted/panelManager/panel_kia/scrolllist_kia").GetComponent<UIScrollList>();
+                available = new StockRoster(availableCrew);
 
                 // Set up button list:
                 SortButtonDef[] buttons = new SortButtonDef[]{ StandardButtonDefs.ByName,
@@ -34,7 +35,7 @@ namespace KerbalSorter.Hooks
 
                 // Initialize the sort bar:
                 sortBar = gameObject.AddComponent<SortingButtons>();
-                //sortBar.SetRoster(available);
+                sortBar.SetRoster(available);
                 sortBar.SetButtons(buttons);
                 sortBar.enabled = false;
             } catch( Exception e ){

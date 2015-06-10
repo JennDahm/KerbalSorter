@@ -23,8 +23,7 @@ namespace KerbalSorter.Hooks
                 }
                 UIScrollList[] lists = window.GetComponentsInChildren<UIScrollList>(true);
                 availableCrew = null;
-                foreach (UIScrollList list in lists)
-                {
+                foreach( UIScrollList list in lists ){
                     if (list.name == "scrolllist_avail")
                     {
                         availableCrew = list;
@@ -34,7 +33,7 @@ namespace KerbalSorter.Hooks
                 if( availableCrew == null ){
                     throw new Exception("Could not find Available Crew List!");
                 }
-                //Roster available = ...
+                StockRoster available = new StockRoster(availableCrew);
 
                 // Set up button list:
                 SortButtonDef[] buttons = new SortButtonDef[]{ StandardButtonDefs.ByName,
@@ -43,7 +42,7 @@ namespace KerbalSorter.Hooks
 
                 // Initialize the sort bar:
                 sortBar = gameObject.AddComponent<SortingButtons>();
-                //sortBar.SetRoster(available);
+                sortBar.SetRoster(available);
                 sortBar.SetButtons(buttons);
                 sortBar.enabled = false;
             } catch( Exception e ){

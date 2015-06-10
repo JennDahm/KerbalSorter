@@ -52,6 +52,7 @@
     <Compile Include="Hooks\AstronautComplexHook.cs" />
     <Compile Include="Hooks\EditorHook.cs" />
     <Compile Include="Hooks\LaunchWindowHook.cs" />
+    <Compile Include="Hooks\StockRoster.cs" />
     <Compile Include="Hooks\Utilities.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="SortingButtons.cs" />

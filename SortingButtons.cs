@@ -17,13 +17,18 @@ namespace KerbalSorter
         bool skinSetup = false;
         bool expanded = false;
 
+        List<int> buttonSelectOrder = new List<int>();
+        bool sorted = false;
+
         // Apparently we can't use constructors in Unity, so we'll have to deal with it this way:
         public void SetRoster(Roster<IUIListObject> roster) {
             this.roster = roster;
+            this.sorted = false;
         }
         public void SetButtons(SortButtonDef[] buttons) {
             this.buttons = buttons;
             this.buttonStates = new int[buttons.Length];
+            this.buttonSelectOrder.Clear();
         }
         public void SetPos(float x, float y) {
             this.x = x;
@@ -32,6 +37,7 @@ namespace KerbalSorter
 
 
         protected void OnEnable() {
+            sorted = false;
         }
         protected void OnDisable() {
             expanded = false;
@@ -59,6 +65,11 @@ namespace KerbalSorter
                     bool pressed = GUI.Button(new Rect(nextX,y , 25,25), new GUIContent(buttonIcon,hoverText), buttonStyle);
                     if( pressed ){
                         buttonStates[i] = (buttonStates[i]+1) % buttons[i].numStates;
+                        buttonSelectOrder.Remove(i);
+                        if( buttonStates[i] != 0 ){
+                            buttonSelectOrder.Add(i);
+                        }
+                        sorted = false;
                     }
                     nextX += 25;
                 }
@@ -66,6 +77,21 @@ namespace KerbalSorter
 
             if( masterPressed ){
                 expanded = !expanded;
+            }
+
+            // Do sorting:
+            SortRoster();
+        }
+
+        public void SortRoster() {
+            if( roster != null && !sorted ){
+                KerbalComparer[] comparisons = new KerbalComparer[buttonSelectOrder.Count];
+                for( int i = 0; i < comparisons.Length; i++ ){
+                    int bIdx = buttonSelectOrder[i];
+                    comparisons[i] = buttons[bIdx].comparers[buttonStates[bIdx]];
+                }
+                CrewSorter<IUIListObject>.SortRoster(roster, comparisons);
+                sorted = true;
             }
         }
     }
