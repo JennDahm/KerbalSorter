@@ -1,4 +1,4 @@
-# KerbalSorter 0.3
+# KerbalSorter 0.4 (In Progress)
 A mod for Kerbal Space Program that allows players to sort their crew rosters.
 
 This mod adds a small toolbar to every crew roster in the game outside of flight mode for sorting your kerbals! Currently supported sorting criterion are:
@@ -17,16 +17,17 @@ If you have lots of kerbals, or are simply very organized, this is the mod for y
 
 ## To-Do
 
-* Add sorting assigned and KIA crew in the Astronaut Complex
-* Add sorting by number of flights
-* Add fly-in animation to editor sort bar to match the Crew tab fly-in animation.
-* Re-sort lists when they change.
-* Perhaps find a way to restore original order when sorting options are cancelled.
+* Add sorting by number of flights.
+* Re-sort Editor and Launch Window lists when they change.
+* Determine original order for assigned kerbals.
+* Add tooltips.
 
 
 ## Bugs
 
-There are no known bugs at the moment. Please file an issue if you find one!
+These are the known bugs at the moment. Please file an issue if you find another one!
+* When choosing a ship in the Launch Window, crew is auto-populated from the original order, not the sorted order. I am unsure how to fix this.
+* When removing a kerbal from a vehicle's crew roster in either the Editor or the Launch Window, the kerbal is not sorted back into the available list; instead they're just put at the top.
 
 
 ## License
