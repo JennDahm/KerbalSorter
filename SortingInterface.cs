@@ -149,5 +149,27 @@ namespace KerbalSorter
         static public int None(ProtoCrewMember a, ProtoCrewMember b) {
             return 0;
         }
+
+        static public int DefaultAvailable(ProtoCrewMember a, ProtoCrewMember b) {
+            if( a == b ){
+                return 0;
+            }
+            KerbalRoster roster = HighLogic.CurrentGame.CrewRoster;
+            foreach( ProtoCrewMember kerbal in roster.Crew ){
+                if( kerbal == a ) return -1;
+                if( kerbal == b ) return 1;
+            }
+            // Uuuuum, neither are in the roster?
+            return 0;
+        }
+
+        static public int DefaultAssigned(ProtoCrewMember a, ProtoCrewMember b) {
+            return 0;
+        }
+
+        static public int DefaultKilled(ProtoCrewMember a, ProtoCrewMember b) {
+            // Apparently Killed kerbals appear in the same order they would be if they were available.
+            return DefaultAvailable(a,b);
+        }
     }
 }

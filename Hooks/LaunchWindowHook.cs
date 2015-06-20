@@ -44,6 +44,7 @@ namespace KerbalSorter.Hooks
                 sortBar = gameObject.AddComponent<SortingButtons>();
                 sortBar.SetRoster(available);
                 sortBar.SetButtons(buttons);
+                sortBar.SetDefaultOrdering(StandardKerbalComparers.DefaultAvailable);
                 sortBar.enabled = false;
             } catch( Exception e ){
                 Debug.LogError("KerbalSorter: Unexpected error in LaunchWindow Hook! " + e);

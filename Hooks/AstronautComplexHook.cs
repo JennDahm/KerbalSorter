@@ -42,6 +42,7 @@ namespace KerbalSorter.Hooks
                 sortBar = gameObject.AddComponent<SortingButtons>();
                 sortBar.SetRoster(available);
                 sortBar.SetButtons(buttons);
+                sortBar.SetDefaultOrdering(StandardKerbalComparers.DefaultAvailable);
                 sortBar.enabled = false;
                 curPanel = CrewPanel.Available;
 
@@ -75,7 +76,6 @@ namespace KerbalSorter.Hooks
             float x = screenPos.x+targetTab.width+5;
             float y = screenPos.y - 1;
             sortBar.SetPos(x,y);
-            OnTabSwitch(CrewPanel.Available);
 
             sortBar.enabled = true;
         }
@@ -99,12 +99,23 @@ namespace KerbalSorter.Hooks
             this.curPanel = panel;
 
             StockRoster roster = null;
+            KerbalComparer defaultOrder = null;
             switch( panel ){
-                case CrewPanel.Available: roster = this.available; break;
-                case CrewPanel.Assigned:  roster = this.assigned; break;
-                case CrewPanel.Killed:    roster = this.killed; break;
+                case CrewPanel.Available:
+                    roster = this.available;
+                    defaultOrder = StandardKerbalComparers.DefaultAvailable;
+                    break;
+                case CrewPanel.Assigned:
+                    roster = this.assigned;
+                    defaultOrder = StandardKerbalComparers.DefaultAssigned;
+                    break;
+                case CrewPanel.Killed:
+                    roster = this.killed;
+                    defaultOrder = StandardKerbalComparers.DefaultKilled;
+                    break;
             }
             sortBar.SetRoster(roster);
+            sortBar.SetDefaultOrdering(defaultOrder);
         }
 
         protected void OnDestroy() {

@@ -20,6 +20,8 @@ namespace KerbalSorter
         List<int> buttonSelectOrder = new List<int>();
         bool sorted = false;
 
+        KerbalComparer defaultOrder = null;
+
         // Apparently we can't use constructors in Unity, so we'll have to deal with it this way:
         public void SetRoster(Roster<IUIListObject> roster) {
             this.roster = roster;
@@ -33,6 +35,9 @@ namespace KerbalSorter
         public void SetPos(float x, float y) {
             this.x = x;
             this.y = y;
+        }
+        public void SetDefaultOrdering(KerbalComparer comp){
+            defaultOrder = comp;
         }
 
 
@@ -85,10 +90,19 @@ namespace KerbalSorter
 
         public void SortRoster(bool force = true) {
             if( roster != null && (!sorted || force) ){
-                KerbalComparer[] comparisons = new KerbalComparer[buttonSelectOrder.Count];
-                for( int i = 0; i < comparisons.Length; i++ ){
+                int count = buttonSelectOrder.Count;
+                int off = 0;
+                if( defaultOrder != null ) {
+                    count++;
+                    off++;
+                }
+                KerbalComparer[] comparisons = new KerbalComparer[count];
+                if( defaultOrder != null ){
+                    comparisons[0] = defaultOrder;
+                }
+                for( int i = 0; i < buttonSelectOrder.Count; i++ ){
                     int bIdx = buttonSelectOrder[i];
-                    comparisons[i] = buttons[bIdx].comparers[buttonStates[bIdx]];
+                    comparisons[i+off] = buttons[bIdx].comparers[buttonStates[bIdx]];
                 }
                 CrewSorter<IUIListObject>.SortRoster(roster, comparisons);
                 sorted = true;

@@ -46,6 +46,7 @@ namespace KerbalSorter.Hooks
                 sortBar = gameObject.AddComponent<SortingButtons>();
                 sortBar.SetRoster(available);
                 sortBar.SetButtons(buttons);
+                sortBar.SetDefaultOrdering(StandardKerbalComparers.DefaultAvailable);
                 sortBar.SetPos(x, y);
                 sortBar.enabled = false;
             }
