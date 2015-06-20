@@ -80,11 +80,11 @@ namespace KerbalSorter
             }
 
             // Do sorting:
-            SortRoster();
+            SortRoster(false);
         }
 
-        public void SortRoster() {
-            if( roster != null && !sorted ){
+        public void SortRoster(bool force = true) {
+            if( roster != null && (!sorted || force) ){
                 KerbalComparer[] comparisons = new KerbalComparer[buttonSelectOrder.Count];
                 for( int i = 0; i < comparisons.Length; i++ ){
                     int bIdx = buttonSelectOrder[i];
