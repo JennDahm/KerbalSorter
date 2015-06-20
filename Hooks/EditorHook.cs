@@ -13,6 +13,9 @@ namespace KerbalSorter.Hooks
         protected void Start() {
             try{
                 GameEvents.onEditorScreenChange.Add(OnEditorScreenChange);
+                // We actually do need these:
+                GameEvents.onGUIAstronautComplexSpawn.Add(OnACSpawn);
+                GameEvents.onGUIAstronautComplexDespawn.Add(OnACDespawn);
 
                 // Get Roster:
                 UIScrollList[] lists = UIManager.instance.gameObject.GetComponentsInChildren<UIScrollList>(true);
@@ -70,6 +73,8 @@ namespace KerbalSorter.Hooks
 
         protected void OnDestroy() {
             GameEvents.onEditorScreenChange.Remove(OnEditorScreenChange);
+            GameEvents.onGUIAstronautComplexSpawn.Remove(OnACSpawn);
+            GameEvents.onGUIAstronautComplexDespawn.Remove(OnACDespawn);
         }
 
         protected void OnEditorScreenChange(EditorScreen screen) {
@@ -84,6 +89,15 @@ namespace KerbalSorter.Hooks
             } else {
                 sortBar.enabled = false;
             }
+        }
+
+        protected void OnACSpawn(){
+            sortBar.enabled = false;
+        }
+        protected void OnACDespawn()
+        {
+            // When we come out of the AC, we'll be in the Crew Select screen.
+            sortBar.enabled = true;
         }
 
 

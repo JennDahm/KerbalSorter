@@ -10,11 +10,16 @@ namespace KerbalSorter.Hooks
     public class LaunchWindowHook : MonoBehaviour {
         SortingButtons sortBar;
         UIScrollList availableCrew;
+        bool launchScreenUp = false;
+
         protected void Start() {
             try{
                 GameEvents.onGUILaunchScreenSpawn.Add(LaunchScreenSpawn);
                 GameEvents.onGUILaunchScreenDespawn.Add(LaunchScreenDespawn);
                 //GameEvents.onGUILaunchScreenVesselSelected.Add(VesselSelect);
+                // We actually do need these:
+                GameEvents.onGUIAstronautComplexSpawn.Add(OnACSpawn);
+                GameEvents.onGUIAstronautComplexDespawn.Add(OnACDespawn);
 
                 // Get the Roster:
                 VesselSpawnDialog window = UIManager.instance.gameObject.GetComponentsInChildren<VesselSpawnDialog>(true).FirstOrDefault();
@@ -55,6 +60,8 @@ namespace KerbalSorter.Hooks
             GameEvents.onGUILaunchScreenSpawn.Remove(LaunchScreenSpawn);
             GameEvents.onGUILaunchScreenDespawn.Remove(LaunchScreenDespawn);
             //GameEvents.onGUILaunchScreenVesselSelected.Remove(VesselSelect);
+            GameEvents.onGUIAstronautComplexSpawn.Remove(OnACSpawn);
+            GameEvents.onGUIAstronautComplexDespawn.Remove(OnACDespawn);
         }
 
 
@@ -69,11 +76,24 @@ namespace KerbalSorter.Hooks
             sortBar.SetPos(x, y);
 
             sortBar.enabled = true;
+            launchScreenUp = true;
         }
 
         protected void LaunchScreenDespawn() {
             //Debug.Log("KerbalSorter: Launch Screen Despawned!");
             sortBar.enabled = false;
+            launchScreenUp = false;
+        }
+
+
+        protected void OnACSpawn()
+        {
+            sortBar.enabled = false;
+        }
+        protected void OnACDespawn()
+        {
+            // When we come out of the AC, we may or may not be on the launch screen.
+            sortBar.enabled = launchScreenUp;
         }
     }
 }
