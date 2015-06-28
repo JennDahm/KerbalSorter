@@ -18,16 +18,15 @@ If you have lots of kerbals, or are simply very organized, this is the mod for y
 ## To-Do
 
 * Add sorting by number of flights.
-* Re-sort Editor list when it changes.
 * Determine original order for assigned kerbals.
 * Add tooltips.
+* Figure out how to change default crew auto-assignment.
 
 
 ## Bugs
 
 These are the known bugs at the moment. Please file an issue if you find another one!
-* In the Editor, when removing a kerbal from a vehicle's crew roster, the kerbal is not sorted back into the available list; instead they're just put at the top.
-* In the Launch Window, when dragging and dropping a kerbal into the list of available crew, the kerbal is not sorted back into the available list. I seem to have no way to detect when this is done, nor any way to disable it.
+* In the Launch Windows and Editors, when dragging and dropping a kerbal into the list of available crew, the kerbal is not sorted back into the available list. I seem to have no way to detect when this is done, nor any way to disable it. If you drag and drop your kerbals, you can click on one of the kerbals in the available list to re-sort them.
 
 
 ## License

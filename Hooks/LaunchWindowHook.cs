@@ -29,6 +29,7 @@ namespace KerbalSorter.Hooks
                 }
                 UIScrollList[] lists = window.GetComponentsInChildren<UIScrollList>(true);
                 availableCrew = null;
+                vesselCrew = null;
                 foreach( UIScrollList list in lists ){
                     if (list.name == "scrolllist_avail")
                     {

@@ -23,8 +23,11 @@ namespace KerbalSorter.Hooks
 
         // Prequisites: The vessel has only one cabin with crew in it.
         public static void FixDefaultVesselCrew(UIScrollList vesselCrew, UIScrollList availableCrew, SortingButtons sortBar) {
+            // WARNING: Apparently this causes NullReferenceExceptions when used. I have yet to determine exactly why.
+            // Until I can fix the NullReferenceExceptions, this will be commented out.
+
             // Find the one cabin with crew in it:
-            int numCrew = 0;
+            /*int numCrew = 0;
             int crewLoc = -1;
             for( int i = 0; i < vesselCrew.Count; i++ ) {
                 IUIListObject obj = vesselCrew.GetItem(i);
@@ -37,14 +40,43 @@ namespace KerbalSorter.Hooks
                     if( crewLoc < 0 ) {
                         crewLoc = i;
                     }
-                    Debug.Log("KerbalSorter: " + cont.GetName() + " found in the vessel's crew.");
+                    string debug = "KerbalSorter: " + cont.GetName() + " found in the vessel's crew.";
+                    debug += " In Vessel ";
+                    if( cont.GetCrewRef() != null && cont.GetCrewRef().KerbalRef != null && cont.GetCrewRef().KerbalRef.InVessel != null ){
+                        debug += cont.GetCrewRef().KerbalRef.InVessel.name;
+                    }
+                    else {
+                        debug += "???";
+                    }
+                    debug += " In Part ";
+                    if( cont.GetCrewRef() != null && cont.GetCrewRef().KerbalRef != null && cont.GetCrewRef().KerbalRef.InPart != null ){
+                        debug += cont.GetCrewRef().KerbalRef.InPart.name;
+                    }
+                    else {
+                        debug += "???";
+                    }
+                    debug += " Seat ";
+                    if( cont.GetCrewRef()!=null && cont.GetCrewRef().seat!=null ){
+                        debug += cont.GetCrewRef().seat.name;
+                    }
+                    else {
+                        debug += "???";
+                    }
+                    debug += " Idx ";
+                    if( cont.GetCrewRef()!=null ){
+                        debug += cont.GetCrewRef().seatIdx;
+                    }
+                    else {
+                        debug += "?";
+                    }
+                    Debug.Log(debug);
                     cont.SetButton(CrewItemContainer.ButtonTypes.V);
                     vesselCrew.RemoveItem(i, false);
                     availableCrew.AddItem(obj);
                     numCrew++;
                     i--; // Don't accidentally skip something!
                 }
-            }
+            }*/
 
             // Re-sort the kerbals
             sortBar.SortRoster();
@@ -55,13 +87,13 @@ namespace KerbalSorter.Hooks
             }*/
 
             // Place the appropriate number of kerbals back into the crew roster
-            for( int i = 0; i < numCrew; i++ ) {
+            /*for( int i = 0; i < numCrew; i++ ) {
                 IUIListObject obj = availableCrew.GetItem(0);
                 availableCrew.RemoveItem(0, false);
                 vesselCrew.InsertItem(obj, crewLoc + i);
 
                 obj.gameObject.GetComponent<CrewItemContainer>().SetButton(CrewItemContainer.ButtonTypes.X);
-            }
+            }*/
         }
 
 
