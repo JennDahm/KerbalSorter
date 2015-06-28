@@ -4,8 +4,7 @@ using UnityEngine;
 using System.Linq;
 using System.Collections.Generic;
 
-namespace KerbalSorter.Hooks
-{
+namespace KerbalSorter.Hooks {
     [KSPAddon(KSPAddon.Startup.SpaceCentre, false)]
     public class LaunchWindowHook : MonoBehaviour {
         SortingButtons sortBar;
@@ -14,7 +13,7 @@ namespace KerbalSorter.Hooks
         bool launchScreenUp = false;
 
         protected void Start() {
-            try{
+            try {
                 GameEvents.onGUILaunchScreenSpawn.Add(LaunchScreenSpawn);
                 GameEvents.onGUILaunchScreenDespawn.Add(LaunchScreenDespawn);
                 GameEvents.onGUILaunchScreenVesselSelected.Add(VesselSelect);
@@ -24,32 +23,30 @@ namespace KerbalSorter.Hooks
 
                 // Get the Roster and the vessel crew list:
                 VesselSpawnDialog window = UIManager.instance.gameObject.GetComponentsInChildren<VesselSpawnDialog>(true).FirstOrDefault();
-                if( window == null ){
+                if( window == null ) {
                     throw new Exception("Could not find Launch Window!");
                 }
                 UIScrollList[] lists = window.GetComponentsInChildren<UIScrollList>(true);
                 availableCrew = null;
                 vesselCrew = null;
-                foreach( UIScrollList list in lists ){
-                    if (list.name == "scrolllist_avail")
-                    {
+                foreach( UIScrollList list in lists ) {
+                    if( list.name == "scrolllist_avail" ) {
                         availableCrew = list;
-                        if( vesselCrew != null ){
+                        if( vesselCrew != null ) {
                             break;
                         }
                     }
-                    else if (list.name == "scrolllist_crew")
-                    {
+                    else if( list.name == "scrolllist_crew" ) {
                         vesselCrew = list;
-                        if( availableCrew != null ){
+                        if( availableCrew != null ) {
                             break;
                         }
                     }
                 }
-                if( availableCrew == null ){
+                if( availableCrew == null ) {
                     throw new Exception("Could not find Available Crew List!");
                 }
-                if( vesselCrew == null ){
+                if( vesselCrew == null ) {
                     throw new Exception("Could not find Vessel Crew List!");
                 }
                 StockRoster available = new StockRoster(availableCrew);
@@ -74,7 +71,8 @@ namespace KerbalSorter.Hooks
                 btn.AddValueChangedDelegate(OnResetBtn);
                 btn = anchorButtons.FindChild("button_clear").GetComponent<BTButton>();
                 btn.AddValueChangedDelegate(OnClearBtn);
-            } catch( Exception e ){
+            }
+            catch( Exception e ) {
                 Debug.LogError("KerbalSorter: Unexpected error in LaunchWindow Hook! " + e);
             }
         }
@@ -91,7 +89,7 @@ namespace KerbalSorter.Hooks
         protected void LaunchScreenSpawn(GameEvents.VesselSpawnInfo blah) {
             Transform tab_crewavail = availableCrew.transform.parent.Find("tab_crewavail");
             BTButton tab = tab_crewavail.GetComponent<BTButton>();
-            
+
             // Set position:
             Vector3 tabPos = Utilities.GetPosition(tab_crewavail);
             float x = tabPos.x + tab.width + 5;
@@ -116,7 +114,7 @@ namespace KerbalSorter.Hooks
         protected void OnACSpawn() {
             sortBar.enabled = false;
         }
-        
+
         protected void OnACDespawn() {
             // When we come out of the AC, we may or may not be on the launch screen.
             sortBar.enabled = launchScreenUp;

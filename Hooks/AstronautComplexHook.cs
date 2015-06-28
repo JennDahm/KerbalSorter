@@ -4,8 +4,7 @@ using UnityEngine;
 using System.Linq;
 using System.Collections.Generic;
 
-namespace KerbalSorter.Hooks
-{
+namespace KerbalSorter.Hooks {
     [KSPAddon(KSPAddon.Startup.SpaceCentre, false)]
     public class AstronautComplexHook : MonoBehaviour {
         CMAstronautComplex complex;
@@ -16,7 +15,7 @@ namespace KerbalSorter.Hooks
         CrewPanel curPanel;
 
         protected void Start() {
-            try{
+            try {
                 // Set up hooks:
                 GameEvents.onGUIAstronautComplexSpawn.Add(OnACSpawn);
                 GameEvents.onGUIAstronautComplexDespawn.Add(OnACDespawn);
@@ -25,7 +24,7 @@ namespace KerbalSorter.Hooks
 
                 // Get rosters:
                 complex = UIManager.instance.gameObject.GetComponentsInChildren<CMAstronautComplex>(true).FirstOrDefault();
-                if (complex == null) throw new Exception("Could not find astronaut complex");
+                if( complex == null ) throw new Exception("Could not find astronaut complex");
                 UIScrollList availableCrew = complex.transform.Find("CrewPanels/panel_enlisted/panelManager/panel_available/scrolllist_available").GetComponent<UIScrollList>();
                 UIScrollList assignedCrew = complex.transform.Find("CrewPanels/panel_enlisted/panelManager/panel_assigned/scrolllist_assigned").GetComponent<UIScrollList>();
                 UIScrollList killedCrew = complex.transform.Find("CrewPanels/panel_enlisted/panelManager/panel_kia/scrolllist_kia").GetComponent<UIScrollList>();
@@ -52,17 +51,18 @@ namespace KerbalSorter.Hooks
                 listener.Panel = CrewPanel.Available;
                 listener.Callback = OnTabSwitch;
                 listener.SkipFirstTime = true;
-                
+
                 listener = assignedCrew.gameObject.AddComponent<EnableListener>();
                 listener.Panel = CrewPanel.Assigned;
                 listener.Callback = OnTabSwitch;
                 listener.SkipFirstTime = true;
-                
+
                 listener = killedCrew.gameObject.AddComponent<EnableListener>();
                 listener.Panel = CrewPanel.Killed;
                 listener.Callback = OnTabSwitch;
                 listener.SkipFirstTime = true;
-            } catch( Exception e ){
+            }
+            catch( Exception e ) {
                 Debug.Log("KerbalSorter: Unexpected error in AstronautComplex Hook: " + e);
             }
         }
@@ -73,9 +73,9 @@ namespace KerbalSorter.Hooks
             Transform targetTabTrans = complex.transform.Find("CrewPanels/panel_enlisted/tabs/tab_kia");
             BTPanelTab targetTab = targetTabTrans.GetComponent<BTPanelTab>();
             Vector3 screenPos = Utilities.GetPosition(targetTabTrans);
-            float x = screenPos.x+targetTab.width+5;
+            float x = screenPos.x + targetTab.width + 5;
             float y = screenPos.y - 1;
-            sortBar.SetPos(x,y);
+            sortBar.SetPos(x, y);
 
             sortBar.enabled = true;
         }
@@ -92,15 +92,15 @@ namespace KerbalSorter.Hooks
             Debug.Log("KerbalSorter: OnFire called: "+ kerbal.name + " - " + something);
         }*/
 
-        protected void OnTabSwitch(CrewPanel panel){
-            if( this.curPanel == panel ){
+        protected void OnTabSwitch(CrewPanel panel) {
+            if( this.curPanel == panel ) {
                 return;
             }
             this.curPanel = panel;
 
             StockRoster roster = null;
             KerbalComparer defaultOrder = null;
-            switch( panel ){
+            switch( panel ) {
                 case CrewPanel.Available:
                     roster = this.available;
                     defaultOrder = StandardKerbalComparers.DefaultAvailable;
@@ -138,8 +138,8 @@ namespace KerbalSorter.Hooks
             public Action<CrewPanel> Callback;
             public bool SkipFirstTime = false;
             private bool _doneFirstTime = false;
-            protected void OnEnable(){
-                if( SkipFirstTime && !_doneFirstTime ){
+            protected void OnEnable() {
+                if( SkipFirstTime && !_doneFirstTime ) {
                     _doneFirstTime = true;
                     return;
                 }

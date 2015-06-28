@@ -4,8 +4,7 @@ using UnityEngine;
 using System.Linq;
 using System.Collections.Generic;
 
-namespace KerbalSorter.Hooks
-{
+namespace KerbalSorter.Hooks {
     [KSPAddon(KSPAddon.Startup.EditorAny, false)]
     class EditorHook : MonoBehaviour {
         SortingButtons sortBar;
@@ -14,9 +13,9 @@ namespace KerbalSorter.Hooks
         bool fixDefaultAssignment = false;
         bool loadBtnPressed = false;
         bool noParts = true;
-        
+
         protected void Start() {
-            try{
+            try {
                 // Game Event Hooks
                 GameEvents.onEditorScreenChange.Add(OnEditorScreenChange);
                 GameEvents.onEditorLoad.Add(OnEditorLoad);
@@ -91,17 +90,17 @@ namespace KerbalSorter.Hooks
                 // Add some extra hooks:
                 availableCrew.AddValueChangedDelegate(OnAvailListValueChanged);
                 Transform trans = UIManager.instance.transform.FindChild("panel_CrewAssignmentInEditor");
-                foreach( BTButton btn in trans.GetComponentsInChildren<BTButton>() ){
-                    if( btn.name == "button_reset" ){
+                foreach( BTButton btn in trans.GetComponentsInChildren<BTButton>() ) {
+                    if( btn.name == "button_reset" ) {
                         btn.AddValueChangedDelegate(OnResetBtn);
                     }
-                    else if( btn.name == "button_clear" ){
+                    else if( btn.name == "button_clear" ) {
                         btn.AddValueChangedDelegate(OnClearBtn);
                     }
                 }
                 trans = UIManager.instance.transform.FindChild("TopRightAnchor");
                 foreach( UIButton btn in trans.GetComponentsInChildren<UIButton>() ) {
-                    if( btn.name == "ButtonLoad" ){
+                    if( btn.name == "ButtonLoad" ) {
                         btn.AddValueChangedDelegate(OnLoadBtn);
                     }
                 }
@@ -110,7 +109,7 @@ namespace KerbalSorter.Hooks
                 loadBtnPressed = false;
                 noParts = true;
             }
-            catch (Exception e){
+            catch( Exception e ) {
                 Debug.LogError("KerbalSorter: Unexpected error in Editor Hook! " + e);
             }
         }
@@ -127,7 +126,7 @@ namespace KerbalSorter.Hooks
 
         // Game Event Hooks:
         protected void OnEditorScreenChange(EditorScreen screen) {
-            if( screen == EditorScreen.Crew ){
+            if( screen == EditorScreen.Crew ) {
                 sortBar.enabled = true;
                 playAnimation = true;
                 animProgress = 0f;
@@ -136,17 +135,18 @@ namespace KerbalSorter.Hooks
 
                 //sortBar.gameObject.GetComponent<Animation>().Play("flyin");
 
-                if( fixDefaultAssignment ){
+                if( fixDefaultAssignment ) {
                     Utilities.FixDefaultVesselCrew(vesselCrew, availableCrew, sortBar);
                     fixDefaultAssignment = false;
                 }
-            } else {
+            }
+            else {
                 sortBar.enabled = false;
             }
         }
 
-        protected void OnEditorLoad(ShipConstruct ship, CraftBrowser.LoadType type){
-            if( type == CraftBrowser.LoadType.Normal && loadBtnPressed ){
+        protected void OnEditorLoad(ShipConstruct ship, CraftBrowser.LoadType type) {
+            if( type == CraftBrowser.LoadType.Normal && loadBtnPressed ) {
                 // Unfortunately, the crew roster isn't set up yet here, so we
                 // have to delay fixing the default assignment until either the
                 // user opens the crew assignment tab, or they launch the craft.
@@ -155,15 +155,15 @@ namespace KerbalSorter.Hooks
             }
         }
 
-        protected void OnEditorRestart(){
+        protected void OnEditorRestart() {
             noParts = true;
         }
 
-        protected void OnEditorShipModified(ShipConstruct ship){
-            if( ship.Count == 0 ){
+        protected void OnEditorShipModified(ShipConstruct ship) {
+            if( ship.Count == 0 ) {
                 noParts = true;
             }
-            else if( noParts ){
+            else if( noParts ) {
                 // If they didn't have parts before, they might have placed a
                 // command capsule, which would be auto-filled. We'll need to
                 // correct this.
@@ -172,7 +172,7 @@ namespace KerbalSorter.Hooks
             }
         }
 
-        protected void OnACSpawn(){
+        protected void OnACSpawn() {
             sortBar.enabled = false;
         }
 
@@ -225,8 +225,8 @@ namespace KerbalSorter.Hooks
         float baseY;
 
         protected void Update() {
-            if( playAnimation ){
-                if( animProgress > animEndTime ){
+            if( playAnimation ) {
+                if( animProgress > animEndTime ) {
                     playAnimation = false;
                 }
                 float x = baseX + anim.Evaluate(animProgress);

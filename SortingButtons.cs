@@ -3,8 +3,7 @@ using System;
 using UnityEngine;
 using System.Collections.Generic;
 
-namespace KerbalSorter
-{
+namespace KerbalSorter {
     // Unity apparently doesn't like generics, which would be very useful here. Way to go, Unity.
     public class SortingButtons : MonoBehaviour {
         private Roster<IUIListObject> roster = null;
@@ -36,7 +35,7 @@ namespace KerbalSorter
             this.x = x;
             this.y = y;
         }
-        public void SetDefaultOrdering(KerbalComparer comp){
+        public void SetDefaultOrdering(KerbalComparer comp) {
             defaultOrder = comp;
         }
 
@@ -50,28 +49,28 @@ namespace KerbalSorter
 
 
         protected void OnGUI() {
-            if( !skinSetup ){
+            if( !skinSetup ) {
                 buttonStyle = new GUIStyle(HighLogic.Skin.button);
-                buttonStyle.padding = new RectOffset(4,4,4,4);
+                buttonStyle.padding = new RectOffset(4, 4, 4, 4);
                 skinSetup = true;
             }
 
-            Texture buttonIcon = GameDatabase.Instance.GetTexture("KerbalSorter/Images/" + (expanded?"SortBtnIn":"SortBtnOut"), false);
+            Texture buttonIcon = GameDatabase.Instance.GetTexture("KerbalSorter/Images/" + (expanded ? "SortBtnIn" : "SortBtnOut"), false);
             string hoverText = "Sorting Options";
-            bool masterPressed = GUI.Button(new Rect(x,y , 25,25), new GUIContent(buttonIcon, hoverText), buttonStyle);
+            bool masterPressed = GUI.Button(new Rect(x, y, 25, 25), new GUIContent(buttonIcon, hoverText), buttonStyle);
 
             // Draw the sorting buttons.
-            if( expanded ){
-                float nextX = x+25;
+            if( expanded ) {
+                float nextX = x + 25;
 
-                for( int i = 0; i < buttons.Length; i++ ){
+                for( int i = 0; i < buttons.Length; i++ ) {
                     buttonIcon = GameDatabase.Instance.GetTexture(buttons[i].iconLocs[buttonStates[i]], false);
                     hoverText = buttons[i].hoverText[buttonStates[i]];
-                    bool pressed = GUI.Button(new Rect(nextX,y , 25,25), new GUIContent(buttonIcon,hoverText), buttonStyle);
-                    if( pressed ){
-                        buttonStates[i] = (buttonStates[i]+1) % buttons[i].numStates;
+                    bool pressed = GUI.Button(new Rect(nextX, y, 25, 25), new GUIContent(buttonIcon, hoverText), buttonStyle);
+                    if( pressed ) {
+                        buttonStates[i] = (buttonStates[i] + 1) % buttons[i].numStates;
                         buttonSelectOrder.Remove(i);
-                        if( buttonStates[i] != 0 ){
+                        if( buttonStates[i] != 0 ) {
                             buttonSelectOrder.Add(i);
                         }
                         sorted = false;
@@ -80,7 +79,7 @@ namespace KerbalSorter
                 }
             }
 
-            if( masterPressed ){
+            if( masterPressed ) {
                 expanded = !expanded;
             }
 
@@ -89,7 +88,7 @@ namespace KerbalSorter
         }
 
         public void SortRoster(bool force = true) {
-            if( roster != null && (!sorted || force) ){
+            if( roster != null && (!sorted || force) ) {
                 int count = buttonSelectOrder.Count;
                 int off = 0;
                 if( defaultOrder != null ) {
@@ -97,12 +96,12 @@ namespace KerbalSorter
                     off++;
                 }
                 KerbalComparer[] comparisons = new KerbalComparer[count];
-                if( defaultOrder != null ){
+                if( defaultOrder != null ) {
                     comparisons[0] = defaultOrder;
                 }
-                for( int i = 0; i < buttonSelectOrder.Count; i++ ){
+                for( int i = 0; i < buttonSelectOrder.Count; i++ ) {
                     int bIdx = buttonSelectOrder[i];
-                    comparisons[i+off] = buttons[bIdx].comparers[buttonStates[bIdx]];
+                    comparisons[i + off] = buttons[bIdx].comparers[buttonStates[bIdx]];
                 }
                 CrewSorter<IUIListObject>.SortRoster(roster, comparisons);
                 sorted = true;
@@ -114,19 +113,19 @@ namespace KerbalSorter
         public static void SortRoster(Roster<T> roster, KerbalComparer[] comparisons) {
             //Retrieve and temporarily store the list of kerbals
             T[] sortedRoster = new T[roster.Count];
-            for (int i = 0; i < roster.Count; i++) {
+            for( int i = 0; i < roster.Count; i++ ) {
                 sortedRoster[i] = roster.GetItem(i);
             }
 
             //Run through each comparison:
-            for (int a = 0; a < comparisons.Length; a++) {
+            for( int a = 0; a < comparisons.Length; a++ ) {
                 var compare = comparisons[a];
 
                 //Insertion sort, since it's stable and we don't have a large roster:
-                for (int i = 1; i < sortedRoster.Length; i++) {
+                for( int i = 1; i < sortedRoster.Length; i++ ) {
                     T kerbal = sortedRoster[i];
                     int k = i;
-                    while (0 < k && compare(roster.GetKerbal(kerbal), roster.GetKerbal(sortedRoster[k - 1])) < 0) {
+                    while( 0 < k && compare(roster.GetKerbal(kerbal), roster.GetKerbal(sortedRoster[k - 1])) < 0 ) {
                         sortedRoster[k] = sortedRoster[k - 1];
                         k--;
                     }
@@ -135,10 +134,10 @@ namespace KerbalSorter
             }
 
             //Apply the new order to the roster:
-            while( roster.Count > 0 ){
+            while( roster.Count > 0 ) {
                 roster.RemoveItem(0);
             }
-            for (int i = 0; i < sortedRoster.Length; i++) {
+            for( int i = 0; i < sortedRoster.Length; i++ ) {
                 roster.InsertItem(sortedRoster[i], i);
             }
         }

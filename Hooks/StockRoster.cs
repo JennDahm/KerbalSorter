@@ -4,17 +4,16 @@ using UnityEngine;
 using System.Linq;
 using System.Collections.Generic;
 
-namespace KerbalSorter.Hooks
-{
-    class StockRoster :  Roster<IUIListObject> {
+namespace KerbalSorter.Hooks {
+    class StockRoster : Roster<IUIListObject> {
         private UIScrollList crew;
 
         public StockRoster(UIScrollList crew) {
             this.crew = crew;
         }
 
-        public int Count{
-            get{ return crew.Count; }
+        public int Count {
+            get { return crew.Count; }
         }
 
         public IUIListObject GetItem(int index) {

@@ -4,14 +4,13 @@ using UnityEngine;
 using System.Linq;
 using System.Collections.Generic;
 
-namespace KerbalSorter.Hooks
-{
+namespace KerbalSorter.Hooks {
     static class Utilities {
         public static Vector3 GetPosition(Transform trans) {
             var uiCams = UIManager.instance.uiCameras;
             EZCameraSettings uiCam = null;
-            for( int i = 0; i < uiCams.Length; i++ ){
-                if( (uiCams[i].mask & (1 << trans.gameObject.layer)) != 0 ){
+            for( int i = 0; i < uiCams.Length; i++ ) {
+                if( (uiCams[i].mask & (1 << trans.gameObject.layer)) != 0 ) {
                     uiCam = uiCams[i];
                     break;
                 }
@@ -42,28 +41,28 @@ namespace KerbalSorter.Hooks
                     }
                     string debug = "KerbalSorter: " + cont.GetName() + " found in the vessel's crew.";
                     debug += " In Vessel ";
-                    if( cont.GetCrewRef() != null && cont.GetCrewRef().KerbalRef != null && cont.GetCrewRef().KerbalRef.InVessel != null ){
+                    if( cont.GetCrewRef() != null && cont.GetCrewRef().KerbalRef != null && cont.GetCrewRef().KerbalRef.InVessel != null ) {
                         debug += cont.GetCrewRef().KerbalRef.InVessel.name;
                     }
                     else {
                         debug += "???";
                     }
                     debug += " In Part ";
-                    if( cont.GetCrewRef() != null && cont.GetCrewRef().KerbalRef != null && cont.GetCrewRef().KerbalRef.InPart != null ){
+                    if( cont.GetCrewRef() != null && cont.GetCrewRef().KerbalRef != null && cont.GetCrewRef().KerbalRef.InPart != null ) {
                         debug += cont.GetCrewRef().KerbalRef.InPart.name;
                     }
                     else {
                         debug += "???";
                     }
                     debug += " Seat ";
-                    if( cont.GetCrewRef()!=null && cont.GetCrewRef().seat!=null ){
+                    if( cont.GetCrewRef() != null && cont.GetCrewRef().seat != null ) {
                         debug += cont.GetCrewRef().seat.name;
                     }
                     else {
                         debug += "???";
                     }
                     debug += " Idx ";
-                    if( cont.GetCrewRef()!=null ){
+                    if( cont.GetCrewRef() != null ) {
                         debug += cont.GetCrewRef().seatIdx;
                     }
                     else {
@@ -82,7 +81,7 @@ namespace KerbalSorter.Hooks
             sortBar.SortRoster();
 
             // Add input listeners to each of the kerbals so we can tell when they're dragged
-            /*for( int i = 0; i < availableCrew.Count; i++ ){
+            /*for( int i = 0; i < availableCrew.Count; i++ ) {
                 availableCrew.GetItem(i).AddInputDelegate(OnInput);
             }*/
 
@@ -99,15 +98,15 @@ namespace KerbalSorter.Hooks
 
         public static List<string> EnumerateTransformDescendents(Transform trans) {
             List<string> children = new List<string>();
-            if( trans == null ){
+            if( trans == null ) {
                 return children;
             }
 
-            foreach(Transform child in trans){
+            foreach( Transform child in trans ) {
                 string name = child.name;
                 children.Add(name);
                 List<string> grandchildren = EnumerateTransformDescendents(child);
-                foreach( string grandchild in grandchildren ){
+                foreach( string grandchild in grandchildren ) {
                     children.Add(name + "/" + grandchild);
                 }
             }
