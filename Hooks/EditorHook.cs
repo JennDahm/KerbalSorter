@@ -7,7 +7,7 @@ using System.Collections.Generic;
 namespace KerbalSorter.Hooks {
     [KSPAddon(KSPAddon.Startup.EditorAny, false)]
     class EditorHook : MonoBehaviour {
-        SortingButtons sortBar;
+        SortBar sortBar;
         UIScrollList availableCrew;
         UIScrollList vesselCrew;
         bool fixDefaultAssignment = false;
@@ -66,7 +66,7 @@ namespace KerbalSorter.Hooks {
                 };
 
                 // Initialize the sort bar:
-                sortBar = gameObject.AddComponent<SortingButtons>();
+                sortBar = gameObject.AddComponent<SortBar>();
                 sortBar.SetRoster(available);
                 sortBar.SetButtons(buttons);
                 sortBar.SetDefaultOrdering(StandardKerbalComparers.DefaultAvailable);

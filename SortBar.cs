@@ -5,7 +5,7 @@ using System.Collections.Generic;
 
 namespace KerbalSorter {
     // Unity apparently doesn't like generics, which would be very useful here. Way to go, Unity.
-    public class SortingButtons : MonoBehaviour {
+    public class SortBar : MonoBehaviour {
         private Roster<IUIListObject> roster = null;
         private SortButtonDef[] buttons = new SortButtonDef[0];
         private int[] buttonStates = new int[0];

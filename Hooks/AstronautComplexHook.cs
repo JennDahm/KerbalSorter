@@ -8,7 +8,7 @@ namespace KerbalSorter.Hooks {
     [KSPAddon(KSPAddon.Startup.SpaceCentre, false)]
     public class AstronautComplexHook : MonoBehaviour {
         CMAstronautComplex complex;
-        SortingButtons sortBar;
+        SortBar sortBar;
         StockRoster available;
         StockRoster assigned;
         StockRoster killed;
@@ -38,7 +38,7 @@ namespace KerbalSorter.Hooks {
                 };
 
                 // Initialize the sort bar:
-                sortBar = gameObject.AddComponent<SortingButtons>();
+                sortBar = gameObject.AddComponent<SortBar>();
                 sortBar.SetRoster(available);
                 sortBar.SetButtons(buttons);
                 sortBar.SetDefaultOrdering(StandardKerbalComparers.DefaultAvailable);

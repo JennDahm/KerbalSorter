@@ -21,7 +21,7 @@ namespace KerbalSorter.Hooks {
         }
 
         // Prequisites: The vessel has only one cabin with crew in it.
-        public static void FixDefaultVesselCrew(UIScrollList vesselCrew, UIScrollList availableCrew, SortingButtons sortBar) {
+        public static void FixDefaultVesselCrew(UIScrollList vesselCrew, UIScrollList availableCrew, SortBar sortBar) {
             // WARNING: Apparently this causes NullReferenceExceptions when used. I have yet to determine exactly why.
             // Until I can fix the NullReferenceExceptions, this will be commented out.
 
