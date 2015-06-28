@@ -110,48 +110,63 @@ namespace KerbalSorter.Hooks {
                 noParts = true;
             }
             catch( Exception e ) {
-                Debug.LogError("KerbalSorter: Unexpected error in Editor Hook! " + e);
+                Debug.LogError("KerbalSorter: Unexpected error in EditorHook: " + e);
             }
         }
 
         protected void OnDestroy() {
-            GameEvents.onEditorScreenChange.Remove(OnEditorScreenChange);
-            GameEvents.onEditorLoad.Remove(OnEditorLoad);
-            GameEvents.onEditorRestart.Remove(OnEditorRestart);
-            GameEvents.onEditorShipModified.Remove(OnEditorShipModified);
-            GameEvents.onGUIAstronautComplexSpawn.Remove(OnACSpawn);
-            GameEvents.onGUIAstronautComplexDespawn.Remove(OnACDespawn);
+            try {
+                GameEvents.onEditorScreenChange.Remove(OnEditorScreenChange);
+                GameEvents.onEditorLoad.Remove(OnEditorLoad);
+                GameEvents.onEditorRestart.Remove(OnEditorRestart);
+                GameEvents.onEditorShipModified.Remove(OnEditorShipModified);
+                GameEvents.onGUIAstronautComplexSpawn.Remove(OnACSpawn);
+                GameEvents.onGUIAstronautComplexDespawn.Remove(OnACDespawn);
+            }
+            catch( Exception e ) {
+                Debug.LogError("KerbalSorter: Unexpected error in EditorHook: " + e);
+            }
         }
 
 
         // Game Event Hooks:
         protected void OnEditorScreenChange(EditorScreen screen) {
-            if( screen == EditorScreen.Crew ) {
-                sortBar.enabled = true;
-                playAnimation = true;
-                animProgress = 0f;
-                // To ensure a smooth transition:
-                sortBar.SetPos(baseX + anim.Evaluate(0f), baseY);
+            try {
+                if( screen == EditorScreen.Crew ) {
+                    sortBar.enabled = true;
+                    playAnimation = true;
+                    animProgress = 0f;
+                    // To ensure a smooth transition:
+                    sortBar.SetPos(baseX + anim.Evaluate(0f), baseY);
 
-                //sortBar.gameObject.GetComponent<Animation>().Play("flyin");
+                    //sortBar.gameObject.GetComponent<Animation>().Play("flyin");
 
-                if( fixDefaultAssignment ) {
-                    Utilities.FixDefaultVesselCrew(vesselCrew, availableCrew, sortBar);
-                    fixDefaultAssignment = false;
+                    if( fixDefaultAssignment ) {
+                        Utilities.FixDefaultVesselCrew(vesselCrew, availableCrew, sortBar);
+                        fixDefaultAssignment = false;
+                    }
+                }
+                else {
+                    sortBar.enabled = false;
                 }
             }
-            else {
-                sortBar.enabled = false;
+            catch( Exception e ) {
+                Debug.LogError("KerbalSorter: Unexpected error in EditorHook: " + e);
             }
         }
 
         protected void OnEditorLoad(ShipConstruct ship, CraftBrowser.LoadType type) {
-            if( type == CraftBrowser.LoadType.Normal && loadBtnPressed ) {
-                // Unfortunately, the crew roster isn't set up yet here, so we
-                // have to delay fixing the default assignment until either the
-                // user opens the crew assignment tab, or they launch the craft.
-                fixDefaultAssignment = true;
-                loadBtnPressed = false;
+            try {
+                if( type == CraftBrowser.LoadType.Normal && loadBtnPressed ) {
+                    // Unfortunately, the crew roster isn't set up yet here, so we
+                    // have to delay fixing the default assignment until either the
+                    // user opens the crew assignment tab, or they launch the craft.
+                    fixDefaultAssignment = true;
+                    loadBtnPressed = false;
+                }
+            }
+            catch( Exception e ) {
+                Debug.LogError("KerbalSorter: Unexpected error in EditorHook: " + e);
             }
         }
 
@@ -160,6 +175,10 @@ namespace KerbalSorter.Hooks {
         }
 
         protected void OnEditorShipModified(ShipConstruct ship) {
+            if( ship == null ) {
+                Debug.LogError("KerbalSorter: Expected non-null ShipConstruct in OnEditorShipModified.");
+                return;
+            }
             if( ship.Count == 0 ) {
                 noParts = true;
             }
@@ -186,19 +205,34 @@ namespace KerbalSorter.Hooks {
         protected void OnClearBtn(IUIObject btn) {
             // At this point, the vessel crew list has been emptied back into
             // the list of available crew.
-            sortBar.SortRoster();
+            try {
+                sortBar.SortRoster();
+            }
+            catch( Exception e ) {
+                Debug.LogError("KerbalSorter: Unexpected error in EditorHook: " + e);
+            }
         }
 
         protected void OnLoadBtn(IUIObject btn) {
             // We need this to detect when a craft is being explicitly loaded
             // by the user, rather than automatically loaded on entrance.
-            loadBtnPressed = true;
+            try {
+                loadBtnPressed = true;
+            }
+            catch( Exception e ) {
+                Debug.LogError("KerbalSorter: Unexpected error in EditorHook: " + e);
+            }
         }
 
         protected void OnResetBtn(IUIObject btn) {
             // At this point, the list has been entirely rewritten, and kerbals
             // have already been (temporarily) assigned to the ship.
-            Utilities.FixDefaultVesselCrew(vesselCrew, availableCrew, sortBar);
+            try {
+                Utilities.FixDefaultVesselCrew(vesselCrew, availableCrew, sortBar);
+            }
+            catch( Exception e ) {
+                Debug.LogError("KerbalSorter: Unexpected error in EditorHook: " + e);
+            }
         }
 
         protected void OnAvailListValueChanged(IUIObject obj) {
@@ -209,7 +243,12 @@ namespace KerbalSorter.Hooks {
             // put an InputListener on each of those items, and that doesn't
             // seem to give us a hook *after* the kerbal has been placed into
             // the list, which means ATM we're SOL on really detecting drags.
-            sortBar.SortRoster();
+            try {
+                sortBar.SortRoster();
+            }
+            catch( Exception e ) {
+                Debug.LogError("KerbalSorter: Unexpected error in EditorHook: " + e);
+            }
         }
 
 
@@ -225,13 +264,18 @@ namespace KerbalSorter.Hooks {
         float baseY;
 
         protected void Update() {
-            if( playAnimation ) {
-                if( animProgress > animEndTime ) {
-                    playAnimation = false;
+            try {
+                if( playAnimation ) {
+                    if( animProgress > animEndTime ) {
+                        playAnimation = false;
+                    }
+                    float x = baseX + anim.Evaluate(animProgress);
+                    sortBar.SetPos(x, baseY);
+                    animProgress += Time.deltaTime;
                 }
-                float x = baseX + anim.Evaluate(animProgress);
-                sortBar.SetPos(x, baseY);
-                animProgress += Time.deltaTime;
+            }
+            catch( Exception e ) {
+                Debug.LogError("KerbalSorter: Unexpected error in EditorHook: " + e);
             }
         }
     }

@@ -63,21 +63,26 @@ namespace KerbalSorter.Hooks {
                 listener.SkipFirstTime = true;
             }
             catch( Exception e ) {
-                Debug.Log("KerbalSorter: Unexpected error in AstronautComplex Hook: " + e);
+                Debug.LogError("KerbalSorter: Unexpected error in AstronautComplexHook: " + e);
             }
         }
 
 
         protected void OnACSpawn() {
-            // Set position:
-            Transform targetTabTrans = complex.transform.Find("CrewPanels/panel_enlisted/tabs/tab_kia");
-            BTPanelTab targetTab = targetTabTrans.GetComponent<BTPanelTab>();
-            Vector3 screenPos = Utilities.GetPosition(targetTabTrans);
-            float x = screenPos.x + targetTab.width + 5;
-            float y = screenPos.y - 1;
-            sortBar.SetPos(x, y);
+            try {
+                // Set position:
+                Transform targetTabTrans = complex.transform.Find("CrewPanels/panel_enlisted/tabs/tab_kia");
+                BTPanelTab targetTab = targetTabTrans.GetComponent<BTPanelTab>();
+                Vector3 screenPos = Utilities.GetPosition(targetTabTrans);
+                float x = screenPos.x + targetTab.width + 5;
+                float y = screenPos.y - 1;
+                sortBar.SetPos(x, y);
 
-            sortBar.enabled = true;
+                sortBar.enabled = true;
+            }
+            catch( Exception e ) {
+                Debug.LogError("KerbalSorter: Unexpected error in AstronautComplexHook: " + e);
+            }
         }
 
         protected void OnACDespawn() {
@@ -85,7 +90,12 @@ namespace KerbalSorter.Hooks {
         }
 
         protected void OnHire(ProtoCrewMember kerbal, int numActiveKerbals) {
-            sortBar.SortRoster(true);
+            try {
+                sortBar.SortRoster(true);
+            }
+            catch( Exception e ) {
+                Debug.LogError("KerbalSorter: Unexpected error in AstronautComplexHook: " + e);
+            }
         }
 
         /*protected void OnFire(ProtoCrewMember kerbal, int numActiveKerbals) {
@@ -93,36 +103,46 @@ namespace KerbalSorter.Hooks {
         }*/
 
         protected void OnTabSwitch(CrewPanel panel) {
-            if( this.curPanel == panel ) {
-                return;
-            }
-            this.curPanel = panel;
+            try {
+                if( this.curPanel == panel ) {
+                    return;
+                }
+                this.curPanel = panel;
 
-            StockRoster roster = null;
-            KerbalComparer defaultOrder = null;
-            switch( panel ) {
-                case CrewPanel.Available:
-                    roster = this.available;
-                    defaultOrder = StandardKerbalComparers.DefaultAvailable;
-                    break;
-                case CrewPanel.Assigned:
-                    roster = this.assigned;
-                    defaultOrder = StandardKerbalComparers.DefaultAssigned;
-                    break;
-                case CrewPanel.Killed:
-                    roster = this.killed;
-                    defaultOrder = StandardKerbalComparers.DefaultKilled;
-                    break;
+                StockRoster roster = null;
+                KerbalComparer defaultOrder = null;
+                switch( panel ) {
+                    case CrewPanel.Available:
+                        roster = this.available;
+                        defaultOrder = StandardKerbalComparers.DefaultAvailable;
+                        break;
+                    case CrewPanel.Assigned:
+                        roster = this.assigned;
+                        defaultOrder = StandardKerbalComparers.DefaultAssigned;
+                        break;
+                    case CrewPanel.Killed:
+                        roster = this.killed;
+                        defaultOrder = StandardKerbalComparers.DefaultKilled;
+                        break;
+                }
+                sortBar.SetRoster(roster);
+                sortBar.SetDefaultOrdering(defaultOrder);
             }
-            sortBar.SetRoster(roster);
-            sortBar.SetDefaultOrdering(defaultOrder);
+            catch( Exception e ) {
+                Debug.LogError("KerbalSorter: Unexpected error in AstronautComplexHook: " + e);
+            }
         }
 
         protected void OnDestroy() {
-            GameEvents.onGUIAstronautComplexSpawn.Remove(OnACSpawn);
-            GameEvents.onGUIAstronautComplexDespawn.Remove(OnACDespawn);
-            GameEvents.OnCrewmemberHired.Remove(OnHire);
-            //GameEvents.OnCrewmemberSacked.Remove(OnFire);
+            try {
+                GameEvents.onGUIAstronautComplexSpawn.Remove(OnACSpawn);
+                GameEvents.onGUIAstronautComplexDespawn.Remove(OnACDespawn);
+                GameEvents.OnCrewmemberHired.Remove(OnHire);
+                //GameEvents.OnCrewmemberSacked.Remove(OnFire);
+            }
+            catch( Exception e ) {
+                Debug.LogError("KerbalSorter: Unexpected error in AstronautComplexHook: " + e);
+            }
         }
 
 
@@ -139,11 +159,16 @@ namespace KerbalSorter.Hooks {
             public bool SkipFirstTime = false;
             private bool _doneFirstTime = false;
             protected void OnEnable() {
-                if( SkipFirstTime && !_doneFirstTime ) {
-                    _doneFirstTime = true;
-                    return;
+                try {
+                    if( SkipFirstTime && !_doneFirstTime ) {
+                        _doneFirstTime = true;
+                        return;
+                    }
+                    Callback(Panel);
                 }
-                Callback(Panel);
+                catch( Exception e ) {
+                    Debug.LogError("KerbalSorter: Unexpected error in AstronautComplexHook: " + e);
+                }
             }
         }
     }

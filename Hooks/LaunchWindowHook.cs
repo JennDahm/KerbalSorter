@@ -73,31 +73,41 @@ namespace KerbalSorter.Hooks {
                 btn.AddValueChangedDelegate(OnClearBtn);
             }
             catch( Exception e ) {
-                Debug.LogError("KerbalSorter: Unexpected error in LaunchWindow Hook! " + e);
+                Debug.LogError("KerbalSorter: Unexpected error in LaunchWindowHook: " + e);
             }
         }
 
         protected void OnDestroy() {
-            GameEvents.onGUILaunchScreenSpawn.Remove(LaunchScreenSpawn);
-            GameEvents.onGUILaunchScreenDespawn.Remove(LaunchScreenDespawn);
-            GameEvents.onGUILaunchScreenVesselSelected.Remove(VesselSelect);
-            GameEvents.onGUIAstronautComplexSpawn.Remove(OnACSpawn);
-            GameEvents.onGUIAstronautComplexDespawn.Remove(OnACDespawn);
+            try {
+                GameEvents.onGUILaunchScreenSpawn.Remove(LaunchScreenSpawn);
+                GameEvents.onGUILaunchScreenDespawn.Remove(LaunchScreenDespawn);
+                GameEvents.onGUILaunchScreenVesselSelected.Remove(VesselSelect);
+                GameEvents.onGUIAstronautComplexSpawn.Remove(OnACSpawn);
+                GameEvents.onGUIAstronautComplexDespawn.Remove(OnACDespawn);
+            }
+            catch( Exception e ) {
+                Debug.LogError("KerbalSorter: Unexpected error in LaunchWindowHook: " + e);
+            }
         }
 
         // Game Event Hooks:
         protected void LaunchScreenSpawn(GameEvents.VesselSpawnInfo blah) {
-            Transform tab_crewavail = availableCrew.transform.parent.Find("tab_crewavail");
-            BTButton tab = tab_crewavail.GetComponent<BTButton>();
+            try {
+                Transform tab_crewavail = availableCrew.transform.parent.Find("tab_crewavail");
+                BTButton tab = tab_crewavail.GetComponent<BTButton>();
 
-            // Set position:
-            Vector3 tabPos = Utilities.GetPosition(tab_crewavail);
-            float x = tabPos.x + tab.width + 5;
-            float y = tabPos.y - 1;
-            sortBar.SetPos(x, y);
+                // Set position:
+                Vector3 tabPos = Utilities.GetPosition(tab_crewavail);
+                float x = tabPos.x + tab.width + 5;
+                float y = tabPos.y - 1;
+                sortBar.SetPos(x, y);
 
-            sortBar.enabled = true;
-            launchScreenUp = true;
+                sortBar.enabled = true;
+                launchScreenUp = true;
+            }
+            catch( Exception e ) {
+                Debug.LogError("KerbalSorter: Unexpected error in LaunchWindowHook: " + e);
+            }
         }
 
         protected void LaunchScreenDespawn() {
@@ -108,7 +118,12 @@ namespace KerbalSorter.Hooks {
         protected void VesselSelect(ShipTemplate ship) {
             // At this point, the list has been entirely rewritten, and kerbals
             // have already been (temporarily) assigned to the ship.
-            Utilities.FixDefaultVesselCrew(vesselCrew, availableCrew, sortBar);
+            try {
+                Utilities.FixDefaultVesselCrew(vesselCrew, availableCrew, sortBar);
+            }
+            catch( Exception e ) {
+                Debug.LogError("KerbalSorter: Unexpected error in LaunchWindowHook: " + e);
+            }
         }
 
         protected void OnACSpawn() {
@@ -125,13 +140,23 @@ namespace KerbalSorter.Hooks {
         protected void OnResetBtn(IUIObject btn) {
             // At this point, the list has been entirely rewritten, and kerbals
             // have already been (temporarily) assigned to the ship.
-            Utilities.FixDefaultVesselCrew(vesselCrew, availableCrew, sortBar);
+            try {
+                Utilities.FixDefaultVesselCrew(vesselCrew, availableCrew, sortBar);
+            }
+            catch( Exception e ) {
+                Debug.LogError("KerbalSorter: Unexpected error in LaunchWindowHook: " + e);
+            }
         }
 
         protected void OnClearBtn(IUIObject btn) {
             // At this point, the vessel crew list has been emptied back into
             // the list of available crew.
-            sortBar.SortRoster();
+            try {
+                sortBar.SortRoster();
+            }
+            catch( Exception e ) {
+                Debug.LogError("KerbalSorter: Unexpected error in LaunchWindowHook: " + e);
+            }
         }
 
         protected void OnAvailListValueChanged(IUIObject obj) {
@@ -142,7 +167,12 @@ namespace KerbalSorter.Hooks {
             // put an InputListener on each of those items, and that doesn't
             // seem to give us a hook *after* the kerbal has been placed into
             // the list, which means ATM we're SOL on really detecting drags.
-            sortBar.SortRoster();
+            try {
+                sortBar.SortRoster();
+            }
+            catch( Exception e ) {
+                Debug.LogError("KerbalSorter: Unexpected error in LaunchWindowHook: " + e);
+            }
         }
 
 
