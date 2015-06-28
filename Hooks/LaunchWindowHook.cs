@@ -10,18 +10,19 @@ namespace KerbalSorter.Hooks
     public class LaunchWindowHook : MonoBehaviour {
         SortingButtons sortBar;
         UIScrollList availableCrew;
+        UIScrollList vesselCrew;
         bool launchScreenUp = false;
 
         protected void Start() {
             try{
                 GameEvents.onGUILaunchScreenSpawn.Add(LaunchScreenSpawn);
                 GameEvents.onGUILaunchScreenDespawn.Add(LaunchScreenDespawn);
-                //GameEvents.onGUILaunchScreenVesselSelected.Add(VesselSelect);
+                GameEvents.onGUILaunchScreenVesselSelected.Add(VesselSelect);
                 // We actually do need these:
                 GameEvents.onGUIAstronautComplexSpawn.Add(OnACSpawn);
                 GameEvents.onGUIAstronautComplexDespawn.Add(OnACDespawn);
 
-                // Get the Roster:
+                // Get the Roster and the vessel crew list:
                 VesselSpawnDialog window = UIManager.instance.gameObject.GetComponentsInChildren<VesselSpawnDialog>(true).FirstOrDefault();
                 if( window == null ){
                     throw new Exception("Could not find Launch Window!");
@@ -32,11 +33,23 @@ namespace KerbalSorter.Hooks
                     if (list.name == "scrolllist_avail")
                     {
                         availableCrew = list;
-                        break;
+                        if( vesselCrew != null ){
+                            break;
+                        }
+                    }
+                    else if (list.name == "scrolllist_crew")
+                    {
+                        vesselCrew = list;
+                        if( availableCrew != null ){
+                            break;
+                        }
                     }
                 }
                 if( availableCrew == null ){
                     throw new Exception("Could not find Available Crew List!");
+                }
+                if( vesselCrew == null ){
+                    throw new Exception("Could not find Vessel Crew List!");
                 }
                 StockRoster available = new StockRoster(availableCrew);
 
@@ -51,6 +64,15 @@ namespace KerbalSorter.Hooks
                 sortBar.SetButtons(buttons);
                 sortBar.SetDefaultOrdering(StandardKerbalComparers.DefaultAvailable);
                 sortBar.enabled = false;
+
+
+                // Set up some hooks to detect when the list is changing:
+                availableCrew.AddValueChangedDelegate(OnAvailListValueChanged);
+                Transform anchorButtons = window.transform.FindChild("anchor/vesselInfo/crewAssignment/crewAssignmentSpawnpoint/anchorButtons");
+                BTButton btn = anchorButtons.FindChild("button_reset").GetComponent<BTButton>();
+                btn.AddValueChangedDelegate(OnResetBtn);
+                btn = anchorButtons.FindChild("button_clear").GetComponent<BTButton>();
+                btn.AddValueChangedDelegate(OnClearBtn);
             } catch( Exception e ){
                 Debug.LogError("KerbalSorter: Unexpected error in LaunchWindow Hook! " + e);
             }
@@ -59,12 +81,12 @@ namespace KerbalSorter.Hooks
         protected void OnDestroy() {
             GameEvents.onGUILaunchScreenSpawn.Remove(LaunchScreenSpawn);
             GameEvents.onGUILaunchScreenDespawn.Remove(LaunchScreenDespawn);
-            //GameEvents.onGUILaunchScreenVesselSelected.Remove(VesselSelect);
+            GameEvents.onGUILaunchScreenVesselSelected.Remove(VesselSelect);
             GameEvents.onGUIAstronautComplexSpawn.Remove(OnACSpawn);
             GameEvents.onGUIAstronautComplexDespawn.Remove(OnACDespawn);
         }
 
-
+        // Game Event Hooks:
         protected void LaunchScreenSpawn(GameEvents.VesselSpawnInfo blah) {
             Transform tab_crewavail = availableCrew.transform.parent.Find("tab_crewavail");
             BTButton tab = tab_crewavail.GetComponent<BTButton>();
@@ -80,20 +102,63 @@ namespace KerbalSorter.Hooks
         }
 
         protected void LaunchScreenDespawn() {
-            //Debug.Log("KerbalSorter: Launch Screen Despawned!");
             sortBar.enabled = false;
             launchScreenUp = false;
         }
 
+        protected void VesselSelect(ShipTemplate ship) {
+            // At this point, the list has been entirely rewritten, and kerbals
+            // have already been (temporarily) assigned to the ship.
+            Utilities.FixDefaultVesselCrew(vesselCrew, availableCrew, sortBar);
+        }
 
-        protected void OnACSpawn()
-        {
+        protected void OnACSpawn() {
             sortBar.enabled = false;
         }
-        protected void OnACDespawn()
-        {
+        
+        protected void OnACDespawn() {
             // When we come out of the AC, we may or may not be on the launch screen.
             sortBar.enabled = launchScreenUp;
         }
+
+
+        // Other UI Hooks:
+        protected void OnResetBtn(IUIObject btn) {
+            // At this point, the list has been entirely rewritten, and kerbals
+            // have already been (temporarily) assigned to the ship.
+            Utilities.FixDefaultVesselCrew(vesselCrew, availableCrew, sortBar);
+        }
+
+        protected void OnClearBtn(IUIObject btn) {
+            // At this point, the vessel crew list has been emptied back into
+            // the list of available crew.
+            sortBar.SortRoster();
+        }
+
+        protected void OnAvailListValueChanged(IUIObject obj) {
+            // This is called when we click on a kerbal in the list, or when
+            // the red X next to a kerbal in the vessel crew is clicked.
+            // It is, unfortunately, not called when a kerbal is dragged into,
+            // out of, or within the list. The only way to detect that is to
+            // put an InputListener on each of those items, and that doesn't
+            // seem to give us a hook *after* the kerbal has been placed into
+            // the list, which means ATM we're SOL on really detecting drags.
+            sortBar.SortRoster();
+        }
+
+
+        // Experimental:
+        /*POINTER_INFO.INPUT_EVENT lastInputEvt = POINTER_INFO.INPUT_EVENT.NO_CHANGE;
+        protected void OnInput(ref POINTER_INFO ptr) {
+            if( ptr.evt != lastInputEvt ){
+                Debug.Log("KerbalSorter: OnInput -- " + ptr.evt);
+                lastInputEvt = ptr.evt;
+            }
+            // Catch when the mouse finishes clicking/dragging.
+            if( ptr.evt == POINTER_INFO.INPUT_EVENT.RELEASE_OFF ){
+                Debug.Log("KerbalSorter: Logged drag.");
+                sortBar.SortRoster();
+            }
+        }*/
     }
 }

@@ -8,8 +8,6 @@ namespace KerbalSorter.Hooks
 {
     static class Utilities {
         public static Vector3 GetPosition(Transform trans) {
-            //Transform targetTabTrans = complex.transform.Find("CrewPanels/panel_enlisted/tabs/tab_kia");
-            //BTPanelTab targetTab = targetTabTrans.GetComponent<BTPanelTab>();
             var uiCams = UIManager.instance.uiCameras;
             EZCameraSettings uiCam = null;
             for( int i = 0; i < uiCams.Length; i++ ){
@@ -21,6 +19,49 @@ namespace KerbalSorter.Hooks
             Vector3 screenPos = uiCam.camera.WorldToScreenPoint(trans.position);
             screenPos.y = Screen.height - screenPos.y;
             return screenPos;
+        }
+
+        // Prequisites: The vessel has only one cabin with crew in it.
+        public static void FixDefaultVesselCrew(UIScrollList vesselCrew, UIScrollList availableCrew, SortingButtons sortBar) {
+            // Find the one cabin with crew in it:
+            int numCrew = 0;
+            int crewLoc = -1;
+            for( int i = 0; i < vesselCrew.Count; i++ ) {
+                IUIListObject obj = vesselCrew.GetItem(i);
+                CrewItemContainer cont = obj.gameObject.GetComponent<CrewItemContainer>();
+                if( cont == null && crewLoc >= 0 ) {
+                    // If both the above are true, we've hit the end of the crewed cabin.
+                    break;
+                }
+                else if( cont != null ) {
+                    if( crewLoc < 0 ) {
+                        crewLoc = i;
+                    }
+                    Debug.Log("KerbalSorter: " + cont.GetName() + " found in the vessel's crew.");
+                    cont.SetButton(CrewItemContainer.ButtonTypes.V);
+                    vesselCrew.RemoveItem(i, false);
+                    availableCrew.AddItem(obj);
+                    numCrew++;
+                    i--; // Don't accidentally skip something!
+                }
+            }
+
+            // Re-sort the kerbals
+            sortBar.SortRoster();
+
+            // Add input listeners to each of the kerbals so we can tell when they're dragged
+            /*for( int i = 0; i < availableCrew.Count; i++ ){
+                availableCrew.GetItem(i).AddInputDelegate(OnInput);
+            }*/
+
+            // Place the appropriate number of kerbals back into the crew roster
+            for( int i = 0; i < numCrew; i++ ) {
+                IUIListObject obj = availableCrew.GetItem(0);
+                availableCrew.RemoveItem(0, false);
+                vesselCrew.InsertItem(obj, crewLoc + i);
+
+                obj.gameObject.GetComponent<CrewItemContainer>().SetButton(CrewItemContainer.ButtonTypes.X);
+            }
         }
 
 
