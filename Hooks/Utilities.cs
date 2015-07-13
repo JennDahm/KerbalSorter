@@ -5,7 +5,15 @@ using System.Linq;
 using System.Collections.Generic;
 
 namespace KerbalSorter.Hooks {
+    /// <summary>
+    /// A static class with utility functions.
+    /// </summary>
     static class Utilities {
+        /// <summary>
+        /// Gets the screen position of a particular UI object whose transformation is given.
+        /// </summary>
+        /// <param name="trans">The transformation of the UI object to locate</param>
+        /// <returns>The screen position of the UI object</returns>
         public static Vector3 GetPosition(Transform trans) {
             var uiCams = UIManager.instance.uiCameras;
             EZCameraSettings uiCam = null;
@@ -20,7 +28,13 @@ namespace KerbalSorter.Hooks {
             return screenPos;
         }
 
-        // Prequisites: The vessel has only one cabin with crew in it.
+        /// <summary>
+        /// Replaces a vessel's default crew with the first few kerbals available according to the given sortbar's settings.
+        /// </summary>
+        /// Prequisites: The vessel has only one cabin with crew in it.
+        /// <param name="vesselCrew">List containing the vessel's crew</param>
+        /// <param name="availableCrew">List containing the available crew</param>
+        /// <param name="sortBar">The sortbar whose criterion to sort by</param>
         public static void FixDefaultVesselCrew(UIScrollList vesselCrew, UIScrollList availableCrew, SortBar sortBar) {
             // WARNING: Apparently this causes NullReferenceExceptions when used. I have yet to determine exactly why.
             // Until I can fix the NullReferenceExceptions, this will be commented out.
@@ -96,6 +110,12 @@ namespace KerbalSorter.Hooks {
         }
 
 
+        /// <summary>
+        /// Returns a list of all transform objects under the given transform object.
+        /// </summary>
+        /// This is intended for debug and development purposes only.
+        /// <param name="trans">The transform whose descendents to enumerate</param>
+        /// <returns>A list of all descendents of the given transform</returns>
         public static List<string> EnumerateTransformDescendents(Transform trans) {
             List<string> children = new List<string>();
             if( trans == null ) {

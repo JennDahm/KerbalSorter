@@ -5,6 +5,9 @@ using System.Linq;
 using System.Collections.Generic;
 
 namespace KerbalSorter.Hooks {
+    /// <summary>
+    /// A hook for the Editors. Started up whenever an Editor is loaded.
+    /// </summary>
     [KSPAddon(KSPAddon.Startup.EditorAny, false)]
     class EditorHook : MonoBehaviour {
         SortBar sortBar;
@@ -14,6 +17,9 @@ namespace KerbalSorter.Hooks {
         bool loadBtnPressed = false;
         bool noParts = true;
 
+        /// <summary>
+        /// Set up the SortBar for the Editors' crew assignment panel. (Callback)
+        /// </summary>
         protected void Start() {
             try {
                 // Game Event Hooks
@@ -114,6 +120,9 @@ namespace KerbalSorter.Hooks {
             }
         }
 
+        /// <summary>
+        /// Remove GameEvent hooks when this hook is unloaded. (Callback)
+        /// </summary>
         protected void OnDestroy() {
             try {
                 GameEvents.onEditorScreenChange.Remove(OnEditorScreenChange);
@@ -129,7 +138,14 @@ namespace KerbalSorter.Hooks {
         }
 
 
-        // Game Event Hooks:
+        // ====================================================================
+        //  Game Event Hooks
+        // ====================================================================
+        
+        /// <summary>
+        /// Enable the sort bar when we switch to the Crew AssignmentPanel; disable it when we switch out. (Callback)
+        /// </summary>
+        /// <param name="screen">The screen we've just switched to</param>
         protected void OnEditorScreenChange(EditorScreen screen) {
             try {
                 if( screen == EditorScreen.Crew ) {
@@ -155,6 +171,11 @@ namespace KerbalSorter.Hooks {
             }
         }
 
+        /// <summary>
+        /// Set up to fix default crew assignment when user loads ship. (Callback)
+        /// </summary>
+        /// <param name="ship">The ship just loaded</param>
+        /// <param name="type">How the ship was inserted</param>
         protected void OnEditorLoad(ShipConstruct ship, CraftBrowser.LoadType type) {
             try {
                 if( type == CraftBrowser.LoadType.Normal && loadBtnPressed ) {
@@ -170,10 +191,17 @@ namespace KerbalSorter.Hooks {
             }
         }
 
+        /// <summary>
+        /// Note when the editor restarts. (Callback)
+        /// </summary>
         protected void OnEditorRestart() {
             noParts = true;
         }
 
+        /// <summary>
+        /// Note whenever we place a first part/remove the last part. (Callback)
+        /// </summary>
+        /// <param name="ship">The ship that was modified</param>
         protected void OnEditorShipModified(ShipConstruct ship) {
             if( ship == null ) {
                 Debug.LogError("KerbalSorter: Expected non-null ShipConstruct in OnEditorShipModified.");
@@ -191,20 +219,33 @@ namespace KerbalSorter.Hooks {
             }
         }
 
+        /// <summary>
+        /// Disable the Sort Bar when we jump to the Astronaut Complex. (Callback)
+        /// </summary>
         protected void OnACSpawn() {
             sortBar.enabled = false;
         }
 
+        /// <summary>
+        /// Re-enable the Sort Bar when we leave the Astronaut Complex. (Callback)
+        /// </summary>
         protected void OnACDespawn() {
             // When we come out of the AC, we'll be in the Crew Select screen.
             sortBar.enabled = true;
         }
 
 
-        // Other UI Hooks:
+        // ====================================================================
+        //  Other UI Hooks
+        // ====================================================================
+
+        /// <summary>
+        /// Re-sort the available list when we clear the vessel crew. (Callback)
+        /// </summary>
+        /// This is called after the vessel crew list has been emptied after
+        /// pressing the Clear button.
+        /// <param name="btn"></param>
         protected void OnClearBtn(IUIObject btn) {
-            // At this point, the vessel crew list has been emptied back into
-            // the list of available crew.
             try {
                 sortBar.SortRoster();
             }
@@ -213,9 +254,13 @@ namespace KerbalSorter.Hooks {
             }
         }
 
+        /// <summary>
+        /// Note whenever the Load button is pressed. (Callback)
+        /// </summary>
+        /// We need this to detect when a craft is being explicitly loaded
+        /// by the user, rather than automatically loaded on entrance.
+        /// <param name="btn">The Load button</param>
         protected void OnLoadBtn(IUIObject btn) {
-            // We need this to detect when a craft is being explicitly loaded
-            // by the user, rather than automatically loaded on entrance.
             try {
                 loadBtnPressed = true;
             }
@@ -224,9 +269,13 @@ namespace KerbalSorter.Hooks {
             }
         }
 
+        /// <summary>
+        /// Fix the default vessel crew listing when the Reset button is pressed. (Callback)
+        /// </summary>
+        /// This is called after the list has been entirely rewritten, and
+        /// kerbals have already been (temporarily) assigned to the ship.
+        /// <param name="btn"></param>
         protected void OnResetBtn(IUIObject btn) {
-            // At this point, the list has been entirely rewritten, and kerbals
-            // have already been (temporarily) assigned to the ship.
             try {
                 Utilities.FixDefaultVesselCrew(vesselCrew, availableCrew, sortBar);
             }
@@ -235,14 +284,18 @@ namespace KerbalSorter.Hooks {
             }
         }
 
+        /// <summary>
+        /// Re-sort the list whenever it changes. (Callback)
+        /// </summary>
+        /// This is called when we click on a kerbal in the list, or when
+        /// the red X next to a kerbal in the vessel crew is clicked.
+        /// It is, unfortunately, not called when a kerbal is dragged into,
+        /// out of, or within the list. The only way to detect that is to
+        /// put an InputListener on each of those items, and that doesn't
+        /// seem to give us a hook *after* the kerbal has been placed into
+        /// the list, which means ATM we're SOL on really detecting drags.
+        /// <param name="obj">?</param>
         protected void OnAvailListValueChanged(IUIObject obj) {
-            // This is called when we click on a kerbal in the list, or when
-            // the red X next to a kerbal in the vessel crew is clicked.
-            // It is, unfortunately, not called when a kerbal is dragged into,
-            // out of, or within the list. The only way to detect that is to
-            // put an InputListener on each of those items, and that doesn't
-            // seem to give us a hook *after* the kerbal has been placed into
-            // the list, which means ATM we're SOL on really detecting drags.
             try {
                 sortBar.SortRoster();
             }
@@ -253,7 +306,9 @@ namespace KerbalSorter.Hooks {
 
 
 
-        // ------- Animation handling -------
+        // ====================================================================
+        //  Animation handling
+        // ====================================================================
         // Unity doesn't want to work with us on
         // animation, so we have to do it manually.
         AnimationCurve anim;
@@ -263,6 +318,9 @@ namespace KerbalSorter.Hooks {
         float baseX;
         float baseY;
 
+        /// <summary>
+        /// Update the animation if it's playing. (Callback)
+        /// </summary>
         protected void Update() {
             try {
                 if( playAnimation ) {

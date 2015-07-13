@@ -5,49 +5,113 @@ using System.Collections.Generic;
 
 namespace KerbalSorter {
     // Unity apparently doesn't like generics, which would be very useful here. Way to go, Unity.
+
+    /// <summary>
+    /// Class representing the KerbalSorter Sort Bar.
+    /// </summary>
     public class SortBar : MonoBehaviour {
+        /// <summary>
+        /// The Roster that we're sorting.
+        /// </summary>
         private Roster<IUIListObject> roster = null;
+        /// <summary>
+        /// The buttons to display.
+        /// </summary>
         private SortButtonDef[] buttons = new SortButtonDef[0];
+        /// <summary>
+        /// Each of the buttons' states.
+        /// </summary>
         private int[] buttonStates = new int[0];
+        /// <summary>
+        /// X position on the screen.
+        /// </summary>
         float x = 0;
+        /// <summary>
+        /// Y position on the screen.
+        /// </summary>
         float y = 0;
 
+        /// <summary>
+        /// The style of the displayed buttons.
+        /// </summary>
         GUIStyle buttonStyle;
+        /// <summary>
+        /// Is the style set up yet?
+        /// </summary>
         bool skinSetup = false;
+        /// <summary>
+        /// Is the bar expanded?
+        /// </summary>
         bool expanded = false;
 
+        /// <summary>
+        /// The order in which the user selected the buttons.
+        /// </summary>
         List<int> buttonSelectOrder = new List<int>();
+        /// <summary>
+        /// Have we already sorted the roster?
+        /// </summary>
         bool sorted = false;
 
+        /// <summary>
+        /// The base order of the roster.
+        /// </summary>
+        /// If null, no base order is set.
         KerbalComparer defaultOrder = null;
 
         // Apparently we can't use constructors in Unity, so we'll have to deal with it this way:
+        /// <summary>
+        /// Sets the roster that this Sort Bar will sort.
+        /// </summary>
+        /// <param name="roster">The Roster to sort</param>
         public void SetRoster(Roster<IUIListObject> roster) {
             this.roster = roster;
             this.sorted = false;
         }
+        /// <summary>
+        /// Sets the buttons to display in this Sort Bar.
+        /// </summary>
+        /// <param name="buttons">The list of button definitions to use</param>
         public void SetButtons(SortButtonDef[] buttons) {
             this.buttons = buttons;
             this.buttonStates = new int[buttons.Length];
             this.buttonSelectOrder.Clear();
         }
+        /// <summary>
+        /// Sets the position of the Sort Bar on the screen.
+        /// </summary>
+        /// <param name="x"></param>
+        /// <param name="y"></param>
         public void SetPos(float x, float y) {
             this.x = x;
             this.y = y;
         }
+        /// <summary>
+        /// Sets the base ordering of the Roster.
+        /// </summary>
+        /// <param name="comp">The function defining the base ordering</param>
         public void SetDefaultOrdering(KerbalComparer comp) {
             defaultOrder = comp;
         }
 
 
+        /// <summary>
+        /// Called when the enable property is set to true. DO NOT CALL DIRECTLY.
+        /// </summary>
         protected void OnEnable() {
             sorted = false;
         }
+        /// <summary>
+        /// Called when the enable property is set to false. DO NOT CALL DIRECTLY.
+        /// </summary>
         protected void OnDisable() {
             expanded = false;
         }
 
 
+        /// <summary>
+        /// Called to update the GUI. DO NOT CALL DIRECTLY.
+        /// </summary>
         protected void OnGUI() {
             if( !skinSetup ) {
                 buttonStyle = new GUIStyle(HighLogic.Skin.button);
@@ -87,6 +151,10 @@ namespace KerbalSorter {
             SortRoster(false);
         }
 
+        /// <summary>
+        /// Sorts the Roster.
+        /// </summary>
+        /// <param name="force">Force re-sorting? (Default: true)</param>
         public void SortRoster(bool force = true) {
             if( roster != null && (!sorted || force) ) {
                 int count = buttonSelectOrder.Count;
@@ -109,7 +177,16 @@ namespace KerbalSorter {
         }
     }
 
+    /// <summary>
+    /// Static class that actually does the sorting.
+    /// </summary>
+    /// <typeparam name="T">The type held in the Roster.</typeparam>
     public static class CrewSorter<T> {
+        /// <summary>
+        /// Sorts the given Roster using the given comparison functions.
+        /// </summary>
+        /// <param name="roster">The Roster to sort</param>
+        /// <param name="comparisons">The Comparisons to use, in order of application</param>
         public static void SortRoster(Roster<T> roster, KerbalComparer[] comparisons) {
             //Retrieve and temporarily store the list of kerbals
             T[] sortedRoster = new T[roster.Count];

@@ -5,6 +5,9 @@ using System.Linq;
 using System.Collections.Generic;
 
 namespace KerbalSorter.Hooks {
+    /// <summary>
+    /// The main hook for the Astronaut Complex. Started up whenever the Space Centre is loaded.
+    /// </summary>
     [KSPAddon(KSPAddon.Startup.SpaceCentre, false)]
     public class AstronautComplexHook : MonoBehaviour {
         CMAstronautComplex complex;
@@ -14,6 +17,9 @@ namespace KerbalSorter.Hooks {
         StockRoster killed;
         CrewPanel curPanel;
 
+        /// <summary>
+        /// Set up the SortBar for the Astronaut Complex. (Callback)
+        /// </summary>
         protected void Start() {
             try {
                 // Set up hooks:
@@ -68,6 +74,9 @@ namespace KerbalSorter.Hooks {
         }
 
 
+        /// <summary>
+        /// Set the Sort Bar position and enable it on Astronaut Complex spawn. (Callback)
+        /// </summary>
         protected void OnACSpawn() {
             try {
                 // Set position:
@@ -85,10 +94,18 @@ namespace KerbalSorter.Hooks {
             }
         }
 
+        /// <summary>
+        /// Disable the Sort Bar on Astronaut Complex despawn. (Callback)
+        /// </summary>
         protected void OnACDespawn() {
             sortBar.enabled = false;
         }
 
+        /// <summary>
+        /// Resort the lists when a new kerbal is hired. (Callback)
+        /// </summary>
+        /// <param name="kerbal">The kerbal just hired</param>
+        /// <param name="numActiveKerbals">The new number of active kerbals</param>
         protected void OnHire(ProtoCrewMember kerbal, int numActiveKerbals) {
             try {
                 sortBar.SortRoster(true);
@@ -102,6 +119,10 @@ namespace KerbalSorter.Hooks {
             Debug.Log("KerbalSorter: OnFire called: "+ kerbal.name + " - " + something);
         }*/
 
+        /// <summary>
+        /// Switch the list that the Sort Bar operates with on tab change. (Callback)
+        /// </summary>
+        /// <param name="panel">The new panel</param>
         protected void OnTabSwitch(CrewPanel panel) {
             try {
                 if( this.curPanel == panel ) {
@@ -133,6 +154,9 @@ namespace KerbalSorter.Hooks {
             }
         }
 
+        /// <summary>
+        /// Remove GameEvent hooks when this hook is unloaded. (Callback)
+        /// </summary>
         protected void OnDestroy() {
             try {
                 GameEvents.onGUIAstronautComplexSpawn.Remove(OnACSpawn);
@@ -146,13 +170,20 @@ namespace KerbalSorter.Hooks {
         }
 
 
+        /// <summary>
+        /// The panels in the Astronaut Complex's tab control.
+        /// </summary>
         protected enum CrewPanel {
             Available,
             Assigned,
             Killed
         }
 
-        // Use: Assign as component to component you want to listen to.
+
+        /// <summary>
+        /// A hook into any component's OnEnable event.
+        /// </summary>
+        /// Use: Assign, as a component, to the component you want to listen to.
         protected class EnableListener : MonoBehaviour {
             public CrewPanel Panel;
             public Action<CrewPanel> Callback;
@@ -173,6 +204,9 @@ namespace KerbalSorter.Hooks {
         }
     }
 
+    /// <summary>
+    /// A hook for the Astronaut Complex accessed through the editors.
+    /// </summary>
     [KSPAddon(KSPAddon.Startup.EditorAny, false)]
     public class AstronautComplexHook_EditorFix : AstronautComplexHook {
     }

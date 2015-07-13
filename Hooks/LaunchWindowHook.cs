@@ -5,6 +5,9 @@ using System.Linq;
 using System.Collections.Generic;
 
 namespace KerbalSorter.Hooks {
+    /// <summary>
+    /// A hook for the Launch Windows. Started up whenever the Space Centre is loaded.
+    /// </summary>
     [KSPAddon(KSPAddon.Startup.SpaceCentre, false)]
     public class LaunchWindowHook : MonoBehaviour {
         SortBar sortBar;
@@ -12,6 +15,9 @@ namespace KerbalSorter.Hooks {
         UIScrollList vesselCrew;
         bool launchScreenUp = false;
 
+        /// <summary>
+        /// Set up the Sort Bar for the Launch Windows. (Callback)
+        /// </summary>
         protected void Start() {
             try {
                 GameEvents.onGUILaunchScreenSpawn.Add(LaunchScreenSpawn);
@@ -77,6 +83,9 @@ namespace KerbalSorter.Hooks {
             }
         }
 
+        /// <summary>
+        /// Remove GameEvent hooks when this hook is unloaded. (Callback)
+        /// </summary>
         protected void OnDestroy() {
             try {
                 GameEvents.onGUILaunchScreenSpawn.Remove(LaunchScreenSpawn);
@@ -90,7 +99,14 @@ namespace KerbalSorter.Hooks {
             }
         }
 
-        // Game Event Hooks:
+        // ====================================================================
+        //  Game Event Hooks
+        // ====================================================================
+
+        /// <summary>
+        /// Set the Sort Bar position and enable it on Launch Window spawn. (Callback)
+        /// </summary>
+        /// <param name="blah">?</param>
         protected void LaunchScreenSpawn(GameEvents.VesselSpawnInfo blah) {
             try {
                 Transform tab_crewavail = availableCrew.transform.parent.Find("tab_crewavail");
@@ -110,14 +126,21 @@ namespace KerbalSorter.Hooks {
             }
         }
 
+        /// <summary>
+        /// Disable the Sort Bar on Astronaut Complex despawn. (Callback)
+        /// </summary>
         protected void LaunchScreenDespawn() {
             sortBar.enabled = false;
             launchScreenUp = false;
         }
 
+        /// <summary>
+        /// Fix the default vessel crew listing when a vessel is selected. (Callback)
+        /// </summary>
+        /// This is called after the list has been entirely rewritten, and
+        /// kerbals have already been (temporarily) assigned to the ship.
+        /// <param name="ship">The vessel selected</param>
         protected void VesselSelect(ShipTemplate ship) {
-            // At this point, the list has been entirely rewritten, and kerbals
-            // have already been (temporarily) assigned to the ship.
             try {
                 Utilities.FixDefaultVesselCrew(vesselCrew, availableCrew, sortBar);
             }
@@ -126,20 +149,33 @@ namespace KerbalSorter.Hooks {
             }
         }
 
+        /// <summary>
+        /// Disable the Sort Bar when we jump to the Astronaut Complex. (Callback)
+        /// </summary>
         protected void OnACSpawn() {
             sortBar.enabled = false;
         }
 
+        /// <summary>
+        /// Re-enable the Sort Bar when we leave the Astronaut Complex. (Callback)
+        /// </summary>
         protected void OnACDespawn() {
             // When we come out of the AC, we may or may not be on the launch screen.
             sortBar.enabled = launchScreenUp;
         }
 
 
-        // Other UI Hooks:
+        // ====================================================================
+        //  Other UI Hooks
+        // ====================================================================
+
+        /// <summary>
+        /// Fix the default vessel crew listing when the Reset button is pressed. (Callback)
+        /// </summary>
+        /// This is called after the list has been entirely rewritten, and
+        /// kerbals have already been (temporarily) assigned to the ship.
+        /// <param name="btn"></param>
         protected void OnResetBtn(IUIObject btn) {
-            // At this point, the list has been entirely rewritten, and kerbals
-            // have already been (temporarily) assigned to the ship.
             try {
                 Utilities.FixDefaultVesselCrew(vesselCrew, availableCrew, sortBar);
             }
@@ -148,9 +184,13 @@ namespace KerbalSorter.Hooks {
             }
         }
 
+        /// <summary>
+        /// Re-sort the available list when we clear the vessel crew. (Callback)
+        /// </summary>
+        /// This is called after the vessel crew list has been emptied after
+        /// pressing the Clear button.
+        /// <param name="btn"></param>
         protected void OnClearBtn(IUIObject btn) {
-            // At this point, the vessel crew list has been emptied back into
-            // the list of available crew.
             try {
                 sortBar.SortRoster();
             }
@@ -159,14 +199,18 @@ namespace KerbalSorter.Hooks {
             }
         }
 
+        /// <summary>
+        /// Re-sort the list whenever it changes. (Callback)
+        /// </summary>
+        /// This is called when we click on a kerbal in the list, or when
+        /// the red X next to a kerbal in the vessel crew is clicked.
+        /// It is, unfortunately, not called when a kerbal is dragged into,
+        /// out of, or within the list. The only way to detect that is to
+        /// put an InputListener on each of those items, and that doesn't
+        /// seem to give us a hook *after* the kerbal has been placed into
+        /// the list, which means ATM we're SOL on really detecting drags.
+        /// <param name="obj"></param>
         protected void OnAvailListValueChanged(IUIObject obj) {
-            // This is called when we click on a kerbal in the list, or when
-            // the red X next to a kerbal in the vessel crew is clicked.
-            // It is, unfortunately, not called when a kerbal is dragged into,
-            // out of, or within the list. The only way to detect that is to
-            // put an InputListener on each of those items, and that doesn't
-            // seem to give us a hook *after* the kerbal has been placed into
-            // the list, which means ATM we're SOL on really detecting drags.
             try {
                 sortBar.SortRoster();
             }
