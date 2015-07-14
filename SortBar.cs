@@ -3,6 +3,7 @@ using System;
 using UnityEngine;
 using System.Collections.Generic;
 
+// Consider using Tooltips.TooltipController
 namespace KerbalSorter {
     // Unity apparently doesn't like generics, which would be very useful here. Way to go, Unity.
 
@@ -35,6 +36,10 @@ namespace KerbalSorter {
         /// The style of the displayed buttons.
         /// </summary>
         GUIStyle buttonStyle;
+        /// <summary>
+        /// The style of the displayed tooltip.
+        /// </summary>
+        GUIStyle tooltipStyle;
         /// <summary>
         /// Is the style set up yet?
         /// </summary>
@@ -117,6 +122,11 @@ namespace KerbalSorter {
                 buttonStyle = new GUIStyle(HighLogic.Skin.button);
                 buttonStyle.padding = new RectOffset(4, 4, 4, 4);
                 skinSetup = true;
+                tooltipStyle = new GUIStyle(GUI.skin.textField);
+                tooltipStyle.padding.top += 2;
+                tooltipStyle.padding.bottom += 2;
+                tooltipStyle.padding.left += 2;
+                tooltipStyle.padding.right += 2;
             }
 
             Texture buttonIcon = GameDatabase.Instance.GetTexture("KerbalSorter/Images/" + (expanded ? "SortBtnIn" : "SortBtnOut"), false);
@@ -145,6 +155,11 @@ namespace KerbalSorter {
 
             if( masterPressed ) {
                 expanded = !expanded;
+            }
+
+            if( GUI.tooltip != null && GUI.tooltip != "" ){
+                Vector2 size = tooltipStyle.CalcSize(new GUIContent(GUI.tooltip));
+                GUI.TextField(new Rect(x, y - size.y, size.x, size.y), GUI.tooltip, tooltipStyle);
             }
 
             // Do sorting:
