@@ -241,7 +241,29 @@ namespace KerbalSorter {
         }
 
         /// <summary>
-        /// Sorts by the default order kerbals appear in the Assigned lists; <see cref="KerbalSorter.KerbalComparer(ProtoCrewMember,ProtoCrewMember)"/>.
+        /// Sorts by the default order kerbals appear in the Applicant list; <see cref="KerbalSorter.KerbalComparer(ProtoCrewMember,ProtoCrewMember)"/>.
+        /// </summary>
+        /// The default order that kerbals appear in is the order in which the
+        /// kerbals appear in the save file. Under normal circumstances, the
+        /// order in which the kerbals appear in the save file is the order in
+        /// which they were spawned.
+        static public int DefaultApplicant(ProtoCrewMember a, ProtoCrewMember b) {
+            if( a == b ) {
+                return 0;
+            }
+            KerbalRoster roster = HighLogic.CurrentGame.CrewRoster;
+            foreach( ProtoCrewMember kerbal in roster.Applicants ) {
+                if( kerbal == a )
+                    return -1;
+                if( kerbal == b )
+                    return 1;
+            }
+            // Uuuuum, neither are in the roster?
+            return 0;
+        }
+
+        /// <summary>
+        /// Sorts by the default order kerbals appear in the Assigned list; <see cref="KerbalSorter.KerbalComparer(ProtoCrewMember,ProtoCrewMember)"/>.
         /// </summary>
         /// Currently I don't know exactly how this is ordered, so this just
         /// returns 0 for now.
@@ -250,7 +272,7 @@ namespace KerbalSorter {
         }
 
         /// <summary>
-        /// Sorts by the default order kerbals appear in the Killed lists; <see cref="KerbalSorter.KerbalComparer(ProtoCrewMember,ProtoCrewMember)"/>.
+        /// Sorts by the default order kerbals appear in the Killed list; <see cref="KerbalSorter.KerbalComparer(ProtoCrewMember,ProtoCrewMember)"/>.
         /// </summary>
         /// The default order that kerbals appear in is the order in which the
         /// kerbals appear in the save file. Under normal circumstances, the

@@ -11,14 +11,16 @@ namespace KerbalSorter.Hooks {
     [KSPAddon(KSPAddon.Startup.SpaceCentre, false)]
     public class AstronautComplexHook : MonoBehaviour {
         CMAstronautComplex complex;
-        SortBar sortBar;
+        SortBar sortBarCrew;
+        SortBar sortBarApplicants;
         StockRoster available;
         StockRoster assigned;
         StockRoster killed;
+        StockRoster applicants;
         CrewPanel curPanel;
 
         /// <summary>
-        /// Set up the SortBar for the Astronaut Complex. (Callback)
+        /// Set up the SortBars for the Astronaut Complex. (Callback)
         /// </summary>
         protected void Start() {
             try {
@@ -26,44 +28,56 @@ namespace KerbalSorter.Hooks {
                 GameEvents.onGUIAstronautComplexSpawn.Add(OnACSpawn);
                 GameEvents.onGUIAstronautComplexDespawn.Add(OnACDespawn);
                 GameEvents.OnCrewmemberHired.Add(OnHire);
-                //GameEvents.OnCrewmemberSacked.Add(OnFire);
+                GameEvents.OnCrewmemberSacked.Add(OnFire);
 
                 // Get rosters:
                 complex = UIManager.instance.gameObject.GetComponentsInChildren<CMAstronautComplex>(true).FirstOrDefault();
                 if( complex == null ) throw new Exception("Could not find astronaut complex");
-                UIScrollList availableCrew = complex.transform.Find("CrewPanels/panel_enlisted/panelManager/panel_available/scrolllist_available").GetComponent<UIScrollList>();
-                UIScrollList assignedCrew = complex.transform.Find("CrewPanels/panel_enlisted/panelManager/panel_assigned/scrolllist_assigned").GetComponent<UIScrollList>();
-                UIScrollList killedCrew = complex.transform.Find("CrewPanels/panel_enlisted/panelManager/panel_kia/scrolllist_kia").GetComponent<UIScrollList>();
-                available = new StockRoster(availableCrew);
-                assigned = new StockRoster(assignedCrew);
-                killed = new StockRoster(killedCrew);
+                UIScrollList availableList = complex.transform.Find("CrewPanels/panel_enlisted/panelManager/panel_available/scrolllist_available").GetComponent<UIScrollList>();
+                UIScrollList assignedList = complex.transform.Find("CrewPanels/panel_enlisted/panelManager/panel_assigned/scrolllist_assigned").GetComponent<UIScrollList>();
+                UIScrollList killedList = complex.transform.Find("CrewPanels/panel_enlisted/panelManager/panel_kia/scrolllist_kia").GetComponent<UIScrollList>();
+                UIScrollList applicantList = complex.transform.Find("CrewPanels/panel_applicants/scrolllist_applicants").GetComponent<UIScrollList>();
+                available = new StockRoster(availableList);
+                assigned = new StockRoster(assignedList);
+                killed = new StockRoster(killedList);
+                applicants = new StockRoster(applicantList);
 
                 // Set up button list:
-                SortButtonDef[] buttons = new SortButtonDef[]{ StandardButtonDefs.ByName,
+                SortButtonDef[] buttonsCrew = new SortButtonDef[]{ StandardButtonDefs.ByName,
                     StandardButtonDefs.ByClass, StandardButtonDefs.ByLevel, StandardButtonDefs.ByGender
                 };
+                SortButtonDef[] buttonsApplicants = new SortButtonDef[]{
+                    StandardButtonDefs.ByName, StandardButtonDefs.ByClass, StandardButtonDefs.ByGender
+                };
 
-                // Initialize the sort bar:
-                sortBar = gameObject.AddComponent<SortBar>();
-                sortBar.SetRoster(available);
-                sortBar.SetButtons(buttons);
-                sortBar.SetDefaultOrdering(StandardKerbalComparers.DefaultAvailable);
-                sortBar.enabled = false;
+                // Initialize the crew sort bar:
+                sortBarCrew = gameObject.AddComponent<SortBar>();
+                sortBarCrew.SetRoster(available);
+                sortBarCrew.SetButtons(buttonsCrew);
+                sortBarCrew.SetDefaultOrdering(StandardKerbalComparers.DefaultAvailable);
+                sortBarCrew.enabled = false;
                 curPanel = CrewPanel.Available;
+
+                /// Initialize the applicant sort bar:
+                sortBarApplicants = gameObject.AddComponent<SortBar>();
+                sortBarApplicants.SetRoster(applicants);
+                sortBarApplicants.SetButtons(buttonsApplicants);
+                sortBarApplicants.SetDefaultOrdering(StandardKerbalComparers.DefaultApplicant);
+                sortBarApplicants.enabled = false;
 
 
                 // Assign enable listeners to the rosters:
-                EnableListener listener = availableCrew.gameObject.AddComponent<EnableListener>();
+                EnableListener listener = availableList.gameObject.AddComponent<EnableListener>();
                 listener.Panel = CrewPanel.Available;
                 listener.Callback = OnTabSwitch;
                 listener.SkipFirstTime = true;
 
-                listener = assignedCrew.gameObject.AddComponent<EnableListener>();
+                listener = assignedList.gameObject.AddComponent<EnableListener>();
                 listener.Panel = CrewPanel.Assigned;
                 listener.Callback = OnTabSwitch;
                 listener.SkipFirstTime = true;
 
-                listener = killedCrew.gameObject.AddComponent<EnableListener>();
+                listener = killedList.gameObject.AddComponent<EnableListener>();
                 listener.Panel = CrewPanel.Killed;
                 listener.Callback = OnTabSwitch;
                 listener.SkipFirstTime = true;
@@ -75,7 +89,7 @@ namespace KerbalSorter.Hooks {
 
 
         /// <summary>
-        /// Set the Sort Bar position and enable it on Astronaut Complex spawn. (Callback)
+        /// Set the SortBars' position and enable them on Astronaut Complex spawn. (Callback)
         /// </summary>
         protected void OnACSpawn() {
             try {
@@ -85,9 +99,16 @@ namespace KerbalSorter.Hooks {
                 Vector3 screenPos = Utilities.GetPosition(targetTabTrans);
                 float x = screenPos.x + targetTab.width + 5;
                 float y = screenPos.y - 1;
-                sortBar.SetPos(x, y);
+                sortBarCrew.SetPos(x, y);
+                sortBarCrew.enabled = true;
 
-                sortBar.enabled = true;
+                targetTabTrans = complex.transform.Find("CrewPanels/panel_applicants/tab_crew");
+                BTButton targetTab2 = targetTabTrans.GetComponent<BTButton>(); // Because consistancy is not their strong suit.
+                screenPos = Utilities.GetPosition(targetTabTrans);
+                x = screenPos.x + targetTab2.width + 5;
+                y = screenPos.y - 1;
+                sortBarApplicants.SetPos(x, y);
+                sortBarApplicants.enabled = true;
             }
             catch( Exception e ) {
                 Debug.LogError("KerbalSorter: Unexpected error in AstronautComplexHook: " + e);
@@ -95,29 +116,40 @@ namespace KerbalSorter.Hooks {
         }
 
         /// <summary>
-        /// Disable the Sort Bar on Astronaut Complex despawn. (Callback)
+        /// Disable the SortBars on Astronaut Complex despawn. (Callback)
         /// </summary>
         protected void OnACDespawn() {
-            sortBar.enabled = false;
+            sortBarCrew.enabled = false;
+            sortBarApplicants.enabled = false;
         }
 
         /// <summary>
-        /// Resort the lists when a new kerbal is hired. (Callback)
+        /// Re-sort the crew lists when a new kerbal is hired. (Callback)
         /// </summary>
         /// <param name="kerbal">The kerbal just hired</param>
         /// <param name="numActiveKerbals">The new number of active kerbals</param>
         protected void OnHire(ProtoCrewMember kerbal, int numActiveKerbals) {
             try {
-                sortBar.SortRoster(true);
+                sortBarCrew.SortRoster(true);
             }
             catch( Exception e ) {
                 Debug.LogError("KerbalSorter: Unexpected error in AstronautComplexHook: " + e);
             }
         }
 
-        /*protected void OnFire(ProtoCrewMember kerbal, int numActiveKerbals) {
-            Debug.Log("KerbalSorter: OnFire called: "+ kerbal.name + " - " + something);
-        }*/
+        /// <summary>
+        /// Re-sort the applicant list when a kerbal is fired.
+        /// </summary>
+        /// <param name="kerbal">The kerbal just fired</param>
+        /// <param name="numActiveKerbals">The new number of active kerbals</param>
+        protected void OnFire(ProtoCrewMember kerbal, int numActiveKerbals) {
+            try {
+                sortBarApplicants.SortRoster(true);
+            }
+            catch( Exception e ) {
+                Debug.LogError("KerbalSorter: Unexpected error in AstronautComplexHook: " + e);
+            }
+        }
 
         /// <summary>
         /// Switch the list that the Sort Bar operates with on tab change. (Callback)
@@ -146,8 +178,8 @@ namespace KerbalSorter.Hooks {
                         defaultOrder = StandardKerbalComparers.DefaultKilled;
                         break;
                 }
-                sortBar.SetRoster(roster);
-                sortBar.SetDefaultOrdering(defaultOrder);
+                sortBarCrew.SetRoster(roster);
+                sortBarCrew.SetDefaultOrdering(defaultOrder);
             }
             catch( Exception e ) {
                 Debug.LogError("KerbalSorter: Unexpected error in AstronautComplexHook: " + e);
@@ -162,7 +194,7 @@ namespace KerbalSorter.Hooks {
                 GameEvents.onGUIAstronautComplexSpawn.Remove(OnACSpawn);
                 GameEvents.onGUIAstronautComplexDespawn.Remove(OnACDespawn);
                 GameEvents.OnCrewmemberHired.Remove(OnHire);
-                //GameEvents.OnCrewmemberSacked.Remove(OnFire);
+                GameEvents.OnCrewmemberSacked.Remove(OnFire);
             }
             catch( Exception e ) {
                 Debug.LogError("KerbalSorter: Unexpected error in AstronautComplexHook: " + e);
