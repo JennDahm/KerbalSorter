@@ -109,6 +109,74 @@ namespace KerbalSorter.Hooks {
             }*/
         }
 
+        /// <summary>
+        /// Adds a component to given Game Object that listens for it to be enabled.
+        /// </summary>
+        /// <param name="obj">The Game Object to listen to</param>
+        /// <param name="callback">The function to call when enabled</param>
+        /// <param name="skipFirstTime">Skip the first enable?</param>
+        public static void AddOnEnableListener(GameObject obj, Callback callback, bool skipFirstTime = false) {
+            OnEnableListener listener = obj.AddComponent<OnEnableListener>();
+            listener.Callback = callback;
+            listener.SkipFirstTime = skipFirstTime;
+        }
+
+        /// <summary>
+        /// Adds a component to given Game Object that listens for it to be disabled.
+        /// </summary>
+        /// <param name="obj">The Game Object to listen to</param>
+        /// <param name="callback">The function to call when disabled</param>
+        /// <param name="skipFirstTime">Skip the first disable?</param>
+        public static void AddOnDisableListener(GameObject obj, Callback callback, bool skipFirstTime = false) {
+            OnDisableListener listener = obj.AddComponent<OnDisableListener>();
+            listener.Callback = callback;
+            listener.SkipFirstTime = skipFirstTime;
+        }
+
+        /// <summary>
+        /// A hook into any component's OnEnable event.
+        /// </summary>
+        /// Use: Assign, as a component, to the component you want to listen to.
+        public class OnEnableListener : MonoBehaviour {
+            public Callback Callback;
+            public bool SkipFirstTime = false;
+            private bool _doneFirstTime = false;
+            protected void OnEnable() {
+                try {
+                    if( SkipFirstTime && !_doneFirstTime ) {
+                        _doneFirstTime = true;
+                        return;
+                    }
+                    Callback();
+                }
+                catch( Exception e ) {
+                    Debug.LogError("KerbalSorter: Unexpected error in OnEnableListener: " + e);
+                }
+            }
+        }
+
+        /// <summary>
+        /// A hook into any component's OnDisable event.
+        /// </summary>
+        /// Use: Assign, as a component, to the component you want to listen to.
+        public class OnDisableListener : MonoBehaviour {
+            public Callback Callback;
+            public bool SkipFirstTime = false;
+            private bool _doneFirstTime = false;
+            protected void OnDisable() {
+                try {
+                    if( SkipFirstTime && !_doneFirstTime ) {
+                        _doneFirstTime = true;
+                        return;
+                    }
+                    Callback();
+                }
+                catch( Exception e ) {
+                    Debug.LogError("KerbalSorter: Unexpected error in OnDisableListener: " + e);
+                }
+            }
+        }
+
 
         /// <summary>
         /// Returns a list of all transform objects under the given transform object.

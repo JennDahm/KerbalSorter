@@ -21,7 +21,6 @@ If you have lots of kerbals, or are simply very organized, this is the mod for y
 * Determine original order for assigned kerbals.
 * Figure out how to change default crew auto-assignment.
 * Add fly-in and fly-out animations for the sorting buttons on expansion and collapse?
-* Add compatibility with Oaktree42/KSI-Hiring by disabling the applicant sort bar when that mod is loaded.
 
 
 ## Bugs

@@ -19,6 +19,8 @@ namespace KerbalSorter.Hooks {
         StockRoster applicants;
         CrewPanel curPanel;
 
+        bool KSILoaded = false;
+
         /// <summary>
         /// Set up the SortBars for the Astronaut Complex. (Callback)
         /// </summary>
@@ -67,20 +69,16 @@ namespace KerbalSorter.Hooks {
 
 
                 // Assign enable listeners to the rosters:
-                EnableListener listener = availableList.gameObject.AddComponent<EnableListener>();
-                listener.Panel = CrewPanel.Available;
-                listener.Callback = OnTabSwitch;
-                listener.SkipFirstTime = true;
+                Utilities.AddOnEnableListener(availableList.gameObject, OnTabAvailable, true);
+                Utilities.AddOnEnableListener(assignedList.gameObject, OnTabAssigned, true);
+                Utilities.AddOnEnableListener(killedList.gameObject, OnTabKilled, true);
 
-                listener = assignedList.gameObject.AddComponent<EnableListener>();
-                listener.Panel = CrewPanel.Assigned;
-                listener.Callback = OnTabSwitch;
-                listener.SkipFirstTime = true;
-
-                listener = killedList.gameObject.AddComponent<EnableListener>();
-                listener.Panel = CrewPanel.Killed;
-                listener.Callback = OnTabSwitch;
-                listener.SkipFirstTime = true;
+                // There's no other way to detect KSI's presence, unfortunately. :/
+                foreach( AssemblyLoader.LoadedAssembly asm in AssemblyLoader.loadedAssemblies ){
+                    if( asm.dllName == "KSI" ){
+                        KSILoaded = true;
+                    }
+                }
             }
             catch( Exception e ) {
                 Debug.LogError("KerbalSorter: Unexpected error in AstronautComplexHook: " + e);
@@ -102,13 +100,15 @@ namespace KerbalSorter.Hooks {
                 sortBarCrew.SetPos(x, y);
                 sortBarCrew.enabled = true;
 
-                targetTabTrans = complex.transform.Find("CrewPanels/panel_applicants/tab_crew");
-                BTButton targetTab2 = targetTabTrans.GetComponent<BTButton>(); // Because consistancy is not their strong suit.
-                screenPos = Utilities.GetPosition(targetTabTrans);
-                x = screenPos.x + targetTab2.width + 5;
-                y = screenPos.y - 1;
-                sortBarApplicants.SetPos(x, y);
-                sortBarApplicants.enabled = true;
+                if( !KSILoaded ) {
+                    targetTabTrans = complex.transform.Find("CrewPanels/panel_applicants/tab_crew");
+                    BTButton targetTab2 = targetTabTrans.GetComponent<BTButton>(); // Because consistancy is not their strong suit.
+                    screenPos = Utilities.GetPosition(targetTabTrans);
+                    x = screenPos.x + targetTab2.width + 5;
+                    y = screenPos.y - 1;
+                    sortBarApplicants.SetPos(x, y);
+                    sortBarApplicants.enabled = true; 
+                }
             }
             catch( Exception e ) {
                 Debug.LogError("KerbalSorter: Unexpected error in AstronautComplexHook: " + e);
@@ -152,7 +152,7 @@ namespace KerbalSorter.Hooks {
         }
 
         /// <summary>
-        /// Switch the list that the Sort Bar operates with on tab change. (Callback)
+        /// Switch the list that the crew Sort Bar operates with on tab change. (Callback)
         /// </summary>
         /// <param name="panel">The new panel</param>
         protected void OnTabSwitch(CrewPanel panel) {
@@ -187,6 +187,27 @@ namespace KerbalSorter.Hooks {
         }
 
         /// <summary>
+        /// Switch the crew Sort Bar to operate on the Available list. (Callback)
+        /// </summary>
+        protected void OnTabAvailable() {
+            OnTabSwitch(CrewPanel.Available);
+        }
+
+        /// <summary>
+        /// Switch the crew Sort Bar to operate on the Assigned list. (Callback)
+        /// </summary>
+        protected void OnTabAssigned() {
+            OnTabSwitch(CrewPanel.Assigned);
+        }
+
+        /// <summary>
+        /// Switch the crew Sort Bar to operate on the Killed list. (Callback)
+        /// </summary>
+        protected void OnTabKilled() {
+            OnTabSwitch(CrewPanel.Killed);
+        }
+
+        /// <summary>
         /// Remove GameEvent hooks when this hook is unloaded. (Callback)
         /// </summary>
         protected void OnDestroy() {
@@ -209,30 +230,6 @@ namespace KerbalSorter.Hooks {
             Available,
             Assigned,
             Killed
-        }
-
-
-        /// <summary>
-        /// A hook into any component's OnEnable event.
-        /// </summary>
-        /// Use: Assign, as a component, to the component you want to listen to.
-        protected class EnableListener : MonoBehaviour {
-            public CrewPanel Panel;
-            public Action<CrewPanel> Callback;
-            public bool SkipFirstTime = false;
-            private bool _doneFirstTime = false;
-            protected void OnEnable() {
-                try {
-                    if( SkipFirstTime && !_doneFirstTime ) {
-                        _doneFirstTime = true;
-                        return;
-                    }
-                    Callback(Panel);
-                }
-                catch( Exception e ) {
-                    Debug.LogError("KerbalSorter: Unexpected error in AstronautComplexHook: " + e);
-                }
-            }
         }
     }
 
