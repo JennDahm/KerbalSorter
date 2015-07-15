@@ -265,9 +265,26 @@ namespace KerbalSorter {
         /// <summary>
         /// Sorts by the default order kerbals appear in the Assigned list; <see cref="KerbalSorter.KerbalComparer(ProtoCrewMember,ProtoCrewMember)"/>.
         /// </summary>
-        /// Currently I don't know exactly how this is ordered, so this just
-        /// returns 0 for now.
+        /// The default order that kerbals appear in seems to be the order in
+        /// which the vessels appear in the save file. Under normal
+        /// circumstances, this is the order in which the vessels popped into
+        /// the universe, either by launching them or by undocking/decoupling
+        /// them from another vessel. Then, kerbals are ordered by the order
+        /// in which they appear within the vessel. Generally this is based on
+        /// their distance to the root part of the vessel, and their seat.
         static public int DefaultAssigned(ProtoCrewMember a, ProtoCrewMember b) {
+            if( a == b ) {
+                return 0;
+            }
+            foreach( ProtoVessel vessel in HighLogic.CurrentGame.flightState.protoVessels ) {
+                foreach( ProtoCrewMember kerbal in vessel.GetVesselCrew() ) {
+                    if( kerbal == a )
+                        return -1;
+                    if( kerbal == b )
+                        return 1;
+                }
+            }
+            // Uuuuum, neither are assigned?
             return 0;
         }
 
