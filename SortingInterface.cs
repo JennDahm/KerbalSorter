@@ -95,6 +95,18 @@ namespace KerbalSorter {
                                              StandardKerbalComparers.GenderAscending,
                                              StandardKerbalComparers.GenderDescending}
         };
+        static public SortButtonDef ByNumFlights = new SortButtonDef{
+            numStates = 3,
+            iconLocs = new string[]{ BaseDir+"SortFlights",
+                                     BaseDir+"SortFlightsAsc",
+                                     BaseDir+"SortFlightsDes"},
+            hoverText = new string[]{ "Sort by Number of Flights",
+                                      "Sort by Number of Flights, Ascending",
+                                      "Sort by Number of Flights, Descending"},
+            comparers = new KerbalComparer[]{StandardKerbalComparers.None,
+                                             StandardKerbalComparers.NumFlightsAscending,
+                                             StandardKerbalComparers.NumFlightsDescending}
+        };
     }
 
     /// <summary>
@@ -203,7 +215,7 @@ namespace KerbalSorter {
         /// Sorts by number of completed flights, lower numbers first; <see cref="KerbalSorter.KerbalComparer(ProtoCrewMember,ProtoCrewMember)"/>.
         /// </summary>
         static public int NumFlightsAscending(ProtoCrewMember a, ProtoCrewMember b) {
-            return a.flightLog.Entries.Count - b.flightLog.Entries.Count;
+            return a.careerLog.Entries.Count - b.careerLog.Entries.Count;
         }
         /// <summary>
         /// Sorts by number of completed flights, higher numbers first; <see cref="KerbalSorter.KerbalComparer(ProtoCrewMember,ProtoCrewMember)"/>.

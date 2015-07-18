@@ -17,8 +17,6 @@ If you have lots of kerbals, or are simply very organized, this is the mod for y
 
 ## To-Do
 
-* Add sorting by number of flights.
-* Determine original order for assigned kerbals.
 * Figure out how to change default crew auto-assignment.
 * Add fly-in and fly-out animations for the sorting buttons on expansion and collapse?
 

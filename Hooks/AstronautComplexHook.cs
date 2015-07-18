@@ -45,8 +45,10 @@ namespace KerbalSorter.Hooks {
                 applicants = new StockRoster(applicantList);
 
                 // Set up button list:
-                SortButtonDef[] buttonsCrew = new SortButtonDef[]{ StandardButtonDefs.ByName,
-                    StandardButtonDefs.ByClass, StandardButtonDefs.ByLevel, StandardButtonDefs.ByGender
+                SortButtonDef[] buttonsCrew = new SortButtonDef[]{
+                    StandardButtonDefs.ByName, StandardButtonDefs.ByClass,
+                    StandardButtonDefs.ByLevel, StandardButtonDefs.ByGender,
+                    StandardButtonDefs.ByNumFlights
                 };
                 SortButtonDef[] buttonsApplicants = new SortButtonDef[]{
                     StandardButtonDefs.ByName, StandardButtonDefs.ByClass, StandardButtonDefs.ByGender

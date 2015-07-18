@@ -67,8 +67,10 @@ namespace KerbalSorter.Hooks {
                 float y = tabPos.y - 1;
 
                 // Set up button list:
-                SortButtonDef[] buttons = new SortButtonDef[]{ StandardButtonDefs.ByName,
-                    StandardButtonDefs.ByClass, StandardButtonDefs.ByLevel, StandardButtonDefs.ByGender
+                SortButtonDef[] buttons = new SortButtonDef[]{
+                    StandardButtonDefs.ByName, StandardButtonDefs.ByClass,
+                    StandardButtonDefs.ByLevel, StandardButtonDefs.ByGender,
+                    StandardButtonDefs.ByNumFlights
                 };
 
                 // Initialize the sort bar:
