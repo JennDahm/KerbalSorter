@@ -1,4 +1,4 @@
-# KerbalSorter 0.4 (In Progress)
+# KerbalSorter 0.4
 A mod for Kerbal Space Program that allows players to sort their crew rosters.
 
 This mod adds a small toolbar to every crew roster in the game outside of flight mode for sorting your kerbals! Currently supported sorting criterion are:
@@ -7,8 +7,12 @@ This mod adds a small toolbar to every crew roster in the game outside of flight
 * Class
 * Level
 * Gender
+* Number of Flights
 
 If you have lots of kerbals, or are simply very organized, this is the mod for you!
+
+See also:  
+Development thread: http://forum.kerbalspaceprogram.com/threads/124612
 
 ## Future Plans
 
