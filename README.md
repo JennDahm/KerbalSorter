@@ -39,4 +39,4 @@ This project requires Visual Studio 2012 or greater. It should be compatible wit
 
 The code in this repository is licensed under the BSD 3-Clause license. Please see the LICENSE file included in this repo and in every release for the full text.
 
-Three icons used in this mod (the wrench, steering wheel, and vial, as used in the sorting-by-class button) were taken from game-icons.net, and are licensed by them under the Creative Commons 3.0 License. I did not modify them in any way, except to display them on buttons in the game. All other icons were made by me (Jon Dahm) and are public domain.
+Four icons used in this mod (the wrench, steering wheel, and vial, as used in the sorting-by-class button, and the rocket in the sorting-by-num-flights button) were taken from game-icons.net, and are licensed by them under the Creative Commons 3.0 License. With the exception of the rocket, I did not modify them in any way, except to display them on buttons in the game. The rocket was modified from its original format to remove an exhaust effect and to rotate the ship, as well as to add arrows. All other icons were made by me (Jon Dahm) and are public domain.
