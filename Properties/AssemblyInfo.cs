@@ -6,18 +6,9 @@ using System.Runtime.InteropServices;
 // set of attributes. Change these attribute values to modify the information
 // associated with an assembly.
 [assembly: AssemblyTitle("KerbalSorter")]
-[assembly: AssemblyDescription("")]
-[assembly: AssemblyConfiguration("")]
-[assembly: AssemblyCompany("Microsoft")]
-[assembly: AssemblyProduct("KerbalSorter")]
-[assembly: AssemblyCopyright("Copyright © Microsoft 2015")]
-[assembly: AssemblyTrademark("")]
-[assembly: AssemblyCulture("")]
-
-// Setting ComVisible to false makes the types in this assembly not visible 
-// to COM components.  If you need to access a type in this assembly from 
-// COM, set the ComVisible attribute to true on that type.
-[assembly: ComVisible(false)]
+[assembly: AssemblyDescription("A plugin for Kerbal Space Program allowing users to sort their crew.")]
+[assembly: AssemblyProduct("Kerbal Sorter")]
+[assembly: AssemblyCopyright("Copyright © Jon Dahm 2015")]
 
 // The following GUID is for the ID of the typelib if this project is exposed to COM
 [assembly: Guid("c40bb4c1-1485-4719-8423-838561435355")]
@@ -32,5 +23,4 @@ using System.Runtime.InteropServices;
 // You can specify all the values or you can default the Build and Revision Numbers 
 // by using the '*' as shown below:
 // [assembly: AssemblyVersion("1.0.*")]
-[assembly: AssemblyVersion("1.0.0.0")]
-[assembly: AssemblyFileVersion("1.0.0.0")]
+[assembly: AssemblyVersion("0.4.0.0")]
