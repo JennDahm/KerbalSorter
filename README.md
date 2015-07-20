@@ -1,4 +1,4 @@
-# KerbalSorter 0.4
+# KerbalSorter 1.0 (In Progress)
 A mod for Kerbal Space Program that allows players to sort their crew rosters.
 
 This mod adds a small toolbar to every crew roster in the game outside of flight mode for sorting your kerbals! Currently supported sorting criterion are:
@@ -13,6 +13,8 @@ If you have lots of kerbals, or are simply very organized, this is the mod for y
 
 See also:  
 Development thread: http://forum.kerbalspaceprogram.com/threads/124612
+
+This mod includes version checking using [Mini-AVC.](http://forum.kerbalspaceprogram.com/threads/79745) If you opt-in, it will use the internet to check whether there is a new version available. Data is only read from the internet and no personal information is sent. For a more comprehensive version checking experience, please download the [KSP-AVC Plugin.](http://forum.kerbalspaceprogram.com/threads/79745)
 
 ## Future Plans
 
@@ -32,9 +34,9 @@ These are the known bugs at the moment. Please file an issue if you find another
 
 
 ## How to Contribute
-Just fork it and submit a pull request when you've made the changes you want to see!
+Just fork it and submit a pull request to the dev branch when you've made the changes you want to see!
 
-Setting up the project is easy. All you need to do is create a folder called "lib" in the base folder of the project, then copy the Assembly-CSharp and UnityEngine DLLs from your installation of KSP into that folder.
+Setting up the project is easy. First, create a folder called "lib" in the base folder of the project, then copy the Assembly-CSharp and UnityEngine DLLs from your installation of KSP into that folder. Then, copy the images from the latest release into a new folder called "Images" in the output folder ("project_dir/KerbalSorter"). If you want to test with Mini-AVC, put the latest DLL alongside the mod in your test environment.
 
 This project requires Visual Studio 2012 or greater. It should be compatible with the free version, and with newer versions.
 
