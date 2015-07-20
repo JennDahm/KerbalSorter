@@ -81,6 +81,7 @@ namespace KerbalSorter {
             this.buttons = buttons;
             this.buttonStates = new int[buttons.Length];
             this.buttonSelectOrder.Clear();
+            this.sorted = false;
         }
         /// <summary>
         /// Sets the position of the Sort Bar on the screen.
@@ -97,6 +98,7 @@ namespace KerbalSorter {
         /// <param name="comp">The function defining the base ordering</param>
         public void SetDefaultOrdering(KerbalComparer comp) {
             defaultOrder = comp;
+            this.sorted = false;
         }
 
 

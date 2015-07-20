@@ -49,6 +49,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Hooks\AstronautComplexHook.cs" />
+    <Compile Include="ButtonAndBarLoader.cs" />
     <Compile Include="Hooks\EditorHook.cs" />
     <Compile Include="Hooks\LaunchWindowHook.cs" />
     <Compile Include="Hooks\StockRoster.cs" />
@@ -59,6 +60,12 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="CHANGELOG.md">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="DefaultButtons.cfg">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="DefaultSortBars.cfg">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
     <None Include="KerbalSorter.version">

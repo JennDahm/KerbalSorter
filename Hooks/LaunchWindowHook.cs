@@ -14,6 +14,7 @@ namespace KerbalSorter.Hooks {
         UIScrollList availableCrew;
         UIScrollList vesselCrew;
         bool launchScreenUp = false;
+        bool sortBarDisabled = false;
 
         /// <summary>
         /// Set up the Sort Bar for the Launch Windows. (Callback)
@@ -58,11 +59,7 @@ namespace KerbalSorter.Hooks {
                 StockRoster available = new StockRoster(availableCrew);
 
                 // Set up button list:
-                SortButtonDef[] buttons = new SortButtonDef[]{
-                    StandardButtonDefs.ByName, StandardButtonDefs.ByClass,
-                    StandardButtonDefs.ByLevel, StandardButtonDefs.ByGender,
-                    StandardButtonDefs.ByNumFlights
-                };
+                SortButtonDef[] buttons = ButtonAndBarLoader.SortBarDefs["CrewAssign"];
 
                 // Initialize the sort bar:
                 sortBar = gameObject.AddComponent<SortBar>();
@@ -70,6 +67,9 @@ namespace KerbalSorter.Hooks {
                 sortBar.SetButtons(buttons);
                 sortBar.SetDefaultOrdering(StandardKerbalComparers.DefaultAvailable);
                 sortBar.enabled = false;
+                sortBarDisabled = available == null
+                               || buttons == null
+                               || buttons.Length == 0;
 
 
                 // Set up some hooks to detect when the list is changing:
@@ -120,7 +120,7 @@ namespace KerbalSorter.Hooks {
                 float y = tabPos.y - 1;
                 sortBar.SetPos(x, y);
 
-                sortBar.enabled = true;
+                sortBar.enabled = !sortBarDisabled;
                 launchScreenUp = true;
             }
             catch( Exception e ) {
@@ -144,7 +144,9 @@ namespace KerbalSorter.Hooks {
         /// <param name="ship">The vessel selected</param>
         protected void VesselSelect(ShipTemplate ship) {
             try {
-                Utilities.FixDefaultVesselCrew(vesselCrew, availableCrew, sortBar);
+                if( !sortBarDisabled ) {
+                    Utilities.FixDefaultVesselCrew(vesselCrew, availableCrew, sortBar); 
+                }
             }
             catch( Exception e ) {
                 Debug.LogError("KerbalSorter: Unexpected error in LaunchWindowHook: " + e);
@@ -163,7 +165,7 @@ namespace KerbalSorter.Hooks {
         /// </summary>
         protected void OnACDespawn() {
             // When we come out of the AC, we may or may not be on the launch screen.
-            sortBar.enabled = launchScreenUp;
+            sortBar.enabled = launchScreenUp && !sortBarDisabled;
         }
 
 
@@ -179,7 +181,9 @@ namespace KerbalSorter.Hooks {
         /// <param name="btn"></param>
         protected void OnResetBtn(IUIObject btn) {
             try {
-                Utilities.FixDefaultVesselCrew(vesselCrew, availableCrew, sortBar);
+                if( !sortBarDisabled ) {
+                    Utilities.FixDefaultVesselCrew(vesselCrew, availableCrew, sortBar); 
+                }
             }
             catch( Exception e ) {
                 Debug.LogError("KerbalSorter: Unexpected error in LaunchWindowHook: " + e);
@@ -194,7 +198,9 @@ namespace KerbalSorter.Hooks {
         /// <param name="btn"></param>
         protected void OnClearBtn(IUIObject btn) {
             try {
-                sortBar.SortRoster();
+                if( !sortBarDisabled ) {
+                    sortBar.SortRoster(); 
+                }
             }
             catch( Exception e ) {
                 Debug.LogError("KerbalSorter: Unexpected error in LaunchWindowHook: " + e);
@@ -214,7 +220,9 @@ namespace KerbalSorter.Hooks {
         /// <param name="obj"></param>
         protected void OnAvailListValueChanged(IUIObject obj) {
             try {
-                sortBar.SortRoster();
+                if( !sortBarDisabled ) {
+                    sortBar.SortRoster(); 
+                }
             }
             catch( Exception e ) {
                 Debug.LogError("KerbalSorter: Unexpected error in LaunchWindowHook: " + e);

@@ -16,6 +16,7 @@ namespace KerbalSorter.Hooks {
         bool fixDefaultAssignment = false;
         bool loadBtnPressed = false;
         bool noParts = true;
+        bool sortBarDisabled = false;
 
         /// <summary>
         /// Set up the SortBar for the Editors' crew assignment panel. (Callback)
@@ -67,11 +68,7 @@ namespace KerbalSorter.Hooks {
                 float y = tabPos.y - 1;
 
                 // Set up button list:
-                SortButtonDef[] buttons = new SortButtonDef[]{
-                    StandardButtonDefs.ByName, StandardButtonDefs.ByClass,
-                    StandardButtonDefs.ByLevel, StandardButtonDefs.ByGender,
-                    StandardButtonDefs.ByNumFlights
-                };
+                SortButtonDef[] buttons = ButtonAndBarLoader.SortBarDefs["CrewAssign"];
 
                 // Initialize the sort bar:
                 sortBar = gameObject.AddComponent<SortBar>();
@@ -80,6 +77,9 @@ namespace KerbalSorter.Hooks {
                 sortBar.SetDefaultOrdering(StandardKerbalComparers.DefaultAvailable);
                 sortBar.SetPos(x, y);
                 sortBar.enabled = false;
+                sortBarDisabled = available == null
+                               || buttons == null
+                               || buttons.Length == 0;
 
                 // Create a fly-in animation for the sort bar.
                 baseX = x;
@@ -150,7 +150,7 @@ namespace KerbalSorter.Hooks {
         /// <param name="screen">The screen we've just switched to</param>
         protected void OnEditorScreenChange(EditorScreen screen) {
             try {
-                if( screen == EditorScreen.Crew ) {
+                if( screen == EditorScreen.Crew && !sortBarDisabled ) {
                     sortBar.enabled = true;
                     playAnimation = true;
                     animProgress = 0f;
@@ -233,7 +233,7 @@ namespace KerbalSorter.Hooks {
         /// </summary>
         protected void OnACDespawn() {
             // When we come out of the AC, we'll be in the Crew Select screen.
-            sortBar.enabled = true;
+            sortBar.enabled = !sortBarDisabled;
         }
 
 
@@ -249,7 +249,9 @@ namespace KerbalSorter.Hooks {
         /// <param name="btn"></param>
         protected void OnClearBtn(IUIObject btn) {
             try {
-                sortBar.SortRoster();
+                if( !sortBarDisabled ) {
+                    sortBar.SortRoster(); 
+                }
             }
             catch( Exception e ) {
                 Debug.LogError("KerbalSorter: Unexpected error in EditorHook: " + e);
@@ -279,7 +281,9 @@ namespace KerbalSorter.Hooks {
         /// <param name="btn"></param>
         protected void OnResetBtn(IUIObject btn) {
             try {
-                Utilities.FixDefaultVesselCrew(vesselCrew, availableCrew, sortBar);
+                if( !sortBarDisabled ) {
+                    Utilities.FixDefaultVesselCrew(vesselCrew, availableCrew, sortBar); 
+                }
             }
             catch( Exception e ) {
                 Debug.LogError("KerbalSorter: Unexpected error in EditorHook: " + e);
@@ -299,7 +303,9 @@ namespace KerbalSorter.Hooks {
         /// <param name="obj">?</param>
         protected void OnAvailListValueChanged(IUIObject obj) {
             try {
-                sortBar.SortRoster();
+                if( !sortBarDisabled ) {
+                    sortBar.SortRoster(); 
+                }
             }
             catch( Exception e ) {
                 Debug.LogError("KerbalSorter: Unexpected error in EditorHook: " + e);

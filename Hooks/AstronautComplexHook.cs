@@ -13,13 +13,15 @@ namespace KerbalSorter.Hooks {
         CMAstronautComplex complex;
         SortBar sortBarCrew;
         SortBar sortBarApplicants;
+
+        bool sortBarCrewDisabled = false;
+        bool sortBarApplicantsDisabled = false;
+
         StockRoster available;
         StockRoster assigned;
         StockRoster killed;
         StockRoster applicants;
         CrewPanel curPanel;
-
-        bool KSILoaded = false;
 
         /// <summary>
         /// Set up the SortBars for the Astronaut Complex. (Callback)
@@ -44,23 +46,20 @@ namespace KerbalSorter.Hooks {
                 killed = new StockRoster(killedList);
                 applicants = new StockRoster(applicantList);
 
-                // Set up button list:
-                SortButtonDef[] buttonsCrew = new SortButtonDef[]{
-                    StandardButtonDefs.ByName, StandardButtonDefs.ByClass,
-                    StandardButtonDefs.ByLevel, StandardButtonDefs.ByGender,
-                    StandardButtonDefs.ByNumFlights
-                };
-                SortButtonDef[] buttonsApplicants = new SortButtonDef[]{
-                    StandardButtonDefs.ByName, StandardButtonDefs.ByClass, StandardButtonDefs.ByGender
-                };
+                // Set up button lists:
+                SortButtonDef[] buttonsAvailable  = ButtonAndBarLoader.SortBarDefs["Available"];
+                SortButtonDef[] buttonsApplicants = ButtonAndBarLoader.SortBarDefs["Applicants"];
 
                 // Initialize the crew sort bar:
                 sortBarCrew = gameObject.AddComponent<SortBar>();
                 sortBarCrew.SetRoster(available);
-                sortBarCrew.SetButtons(buttonsCrew);
+                sortBarCrew.SetButtons(buttonsAvailable);
                 sortBarCrew.SetDefaultOrdering(StandardKerbalComparers.DefaultAvailable);
                 sortBarCrew.enabled = false;
                 curPanel = CrewPanel.Available;
+                sortBarCrewDisabled = available == null
+                                   || buttonsAvailable == null
+                                   || buttonsAvailable.Length == 0;
 
                 /// Initialize the applicant sort bar:
                 sortBarApplicants = gameObject.AddComponent<SortBar>();
@@ -68,6 +67,9 @@ namespace KerbalSorter.Hooks {
                 sortBarApplicants.SetButtons(buttonsApplicants);
                 sortBarApplicants.SetDefaultOrdering(StandardKerbalComparers.DefaultApplicant);
                 sortBarApplicants.enabled = false;
+                sortBarApplicantsDisabled = applicants == null
+                                         || buttonsApplicants == null
+                                         || buttonsApplicants.Length == 0;
 
 
                 // Assign enable listeners to the rosters:
@@ -78,7 +80,7 @@ namespace KerbalSorter.Hooks {
                 // There's no other way to detect KSI's presence, unfortunately. :/
                 foreach( AssemblyLoader.LoadedAssembly asm in AssemblyLoader.loadedAssemblies ){
                     if( asm.dllName == "KSI" ){
-                        KSILoaded = true;
+                        sortBarApplicantsDisabled = true;
                     }
                 }
             }
@@ -100,9 +102,9 @@ namespace KerbalSorter.Hooks {
                 float x = screenPos.x + targetTab.width + 5;
                 float y = screenPos.y - 1;
                 sortBarCrew.SetPos(x, y);
-                sortBarCrew.enabled = true;
+                sortBarCrew.enabled = !sortBarCrewDisabled;
 
-                if( !KSILoaded ) {
+                if( !sortBarApplicantsDisabled ) {
                     targetTabTrans = complex.transform.Find("CrewPanels/panel_applicants/tab_crew");
                     BTButton targetTab2 = targetTabTrans.GetComponent<BTButton>(); // Because consistancy is not their strong suit.
                     screenPos = Utilities.GetPosition(targetTabTrans);
@@ -166,22 +168,29 @@ namespace KerbalSorter.Hooks {
 
                 StockRoster roster = null;
                 KerbalComparer defaultOrder = null;
+                SortButtonDef[] buttons = null;
                 switch( panel ) {
                     case CrewPanel.Available:
                         roster = this.available;
                         defaultOrder = StandardKerbalComparers.DefaultAvailable;
+                        buttons = ButtonAndBarLoader.SortBarDefs["Available"];
                         break;
                     case CrewPanel.Assigned:
                         roster = this.assigned;
                         defaultOrder = StandardKerbalComparers.DefaultAssigned;
+                        buttons = ButtonAndBarLoader.SortBarDefs["Assigned"];
                         break;
                     case CrewPanel.Killed:
                         roster = this.killed;
                         defaultOrder = StandardKerbalComparers.DefaultKilled;
+                        buttons = ButtonAndBarLoader.SortBarDefs["Killed"];
                         break;
                 }
                 sortBarCrew.SetRoster(roster);
+                sortBarCrew.SetButtons(buttons);
                 sortBarCrew.SetDefaultOrdering(defaultOrder);
+                sortBarCrewDisabled = roster == null || buttons == null || buttons.Length == 0;
+                sortBarCrew.enabled = !sortBarCrewDisabled;
             }
             catch( Exception e ) {
                 Debug.LogError("KerbalSorter: Unexpected error in AstronautComplexHook: " + e);
