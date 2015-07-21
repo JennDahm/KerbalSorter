@@ -17,6 +17,7 @@ namespace KerbalSorter.Hooks {
         bool loadBtnPressed = false;
         bool noParts = true;
         bool sortBarDisabled = false;
+        bool resortAfterDrag = false;
 
         /// <summary>
         /// Set up the SortBar for the Editors' crew assignment panel. (Callback)
@@ -160,7 +161,9 @@ namespace KerbalSorter.Hooks {
                     //sortBar.gameObject.GetComponent<Animation>().Play("flyin");
 
                     if( fixDefaultAssignment ) {
-                        Utilities.FixDefaultVesselCrew(vesselCrew, availableCrew, sortBar);
+                        Utilities.AddInputDelegateToKerbals(vesselCrew, OnKerbalMouseInput);
+                        Utilities.AddInputDelegateToKerbals(availableCrew, OnKerbalMouseInput);
+                        sortBar.SortRoster();
                         fixDefaultAssignment = false;
                     }
                 }
@@ -282,7 +285,9 @@ namespace KerbalSorter.Hooks {
         protected void OnResetBtn(IUIObject btn) {
             try {
                 if( !sortBarDisabled ) {
-                    Utilities.FixDefaultVesselCrew(vesselCrew, availableCrew, sortBar); 
+                    Utilities.AddInputDelegateToKerbals(vesselCrew, OnKerbalMouseInput);
+                    Utilities.AddInputDelegateToKerbals(availableCrew, OnKerbalMouseInput);
+                    sortBar.SortRoster(); 
                 }
             }
             catch( Exception e ) {
@@ -296,10 +301,7 @@ namespace KerbalSorter.Hooks {
         /// This is called when we click on a kerbal in the list, or when
         /// the red X next to a kerbal in the vessel crew is clicked.
         /// It is, unfortunately, not called when a kerbal is dragged into,
-        /// out of, or within the list. The only way to detect that is to
-        /// put an InputListener on each of those items, and that doesn't
-        /// seem to give us a hook *after* the kerbal has been placed into
-        /// the list, which means ATM we're SOL on really detecting drags.
+        /// out of, or within the list. We need other detection methods for that.
         /// <param name="obj">?</param>
         protected void OnAvailListValueChanged(IUIObject obj) {
             try {
@@ -312,6 +314,40 @@ namespace KerbalSorter.Hooks {
             }
         }
 
+        /// <summary>
+        /// Catch when we finish dragging a kerbal's entry in a list. (Callback)
+        /// </summary>
+        /// We have no other way of detecting dragging, so we have to do this,
+        /// in combination with a later re-sort in the Update hook since the
+        /// mouse input comes before the kerbal is placed.
+        /// <param name="ptr">Information about the mouse input</param>
+        protected void OnKerbalMouseInput(ref POINTER_INFO ptr) {
+            // Catch when the mouse finishes clicking/dragging.
+            if( ptr.evt == POINTER_INFO.INPUT_EVENT.RELEASE_OFF ) {
+                // We can't re-sort here, so we have to signal a change for later.
+                resortAfterDrag = true;
+            }
+        }
+
+        /// <summary>
+        /// Re-sort the list if we just finished dragging a kerbal. Animate if necessary. (Callback)
+        /// </summary>
+        /// This complements the OnKerbalMouseInput hook, allowing us to re-sort
+        /// the list of available kerbals whenever we drag them. I haven't found
+        /// a better way to do that, so here we are.
+        /// This also animates the sort bar as it flies in with the crew select panel.
+        protected void Update() {
+            try {
+                Animate();
+                if( resortAfterDrag ) {
+                    resortAfterDrag = false;
+                    sortBar.SortRoster();
+                }
+            }
+            catch( Exception e ) {
+                Debug.LogError("KerbalSorter: Unexpected error in EditorHook: " + e);
+            }
+        }
 
 
         // ====================================================================
@@ -327,9 +363,9 @@ namespace KerbalSorter.Hooks {
         float baseY;
 
         /// <summary>
-        /// Update the animation if it's playing. (Callback)
+        /// Update the animation if it's playing.
         /// </summary>
-        protected void Update() {
+        protected void Animate() {
             try {
                 if( playAnimation ) {
                     if( animProgress > animEndTime ) {

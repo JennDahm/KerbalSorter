@@ -28,6 +28,20 @@ namespace KerbalSorter.Hooks {
             return screenPos;
         }
 
+
+        public static void AddInputDelegateToKerbals(UIScrollList crew, EZInputDelegate callback) {
+            for( int i = 0; i < crew.Count; i++ ) {
+                IUIListObject obj = crew.GetItem(i);
+                if( obj == null ) {
+                    continue;
+                }
+                CrewItemContainer cont = obj.gameObject.GetComponent<CrewItemContainer>();
+                if( cont != null ) {
+                    obj.AddInputDelegate(callback);
+                }
+            }
+        }
+
         /// <summary>
         /// Replaces a vessel's default crew with the first few kerbals available according to the given sortbar's settings.
         /// </summary>

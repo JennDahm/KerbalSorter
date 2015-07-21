@@ -16,6 +16,8 @@ namespace KerbalSorter.Hooks {
         bool launchScreenUp = false;
         bool sortBarDisabled = false;
 
+        bool resortAfterDrag = false;
+
         /// <summary>
         /// Set up the Sort Bar for the Launch Windows. (Callback)
         /// </summary>
@@ -139,13 +141,17 @@ namespace KerbalSorter.Hooks {
         /// <summary>
         /// Fix the default vessel crew listing when a vessel is selected. (Callback)
         /// </summary>
+        /// This is called every time a vessel is selected, including when the
+        /// Launch Window opens.
         /// This is called after the list has been entirely rewritten, and
         /// kerbals have already been (temporarily) assigned to the ship.
         /// <param name="ship">The vessel selected</param>
         protected void VesselSelect(ShipTemplate ship) {
             try {
                 if( !sortBarDisabled ) {
-                    Utilities.FixDefaultVesselCrew(vesselCrew, availableCrew, sortBar); 
+                    Utilities.AddInputDelegateToKerbals(vesselCrew, OnKerbalMouseInput);
+                    Utilities.AddInputDelegateToKerbals(availableCrew, OnKerbalMouseInput);
+                    sortBar.SortRoster();
                 }
             }
             catch( Exception e ) {
@@ -177,12 +183,16 @@ namespace KerbalSorter.Hooks {
         /// Fix the default vessel crew listing when the Reset button is pressed. (Callback)
         /// </summary>
         /// This is called after the list has been entirely rewritten, and
-        /// kerbals have already been (temporarily) assigned to the ship.
-        /// <param name="btn"></param>
+        /// kerbals have already been (temporarily) assigned to the ship. Here,
+        /// we assign input delegates to each of the entries so that we can
+        /// detect dragging.
+        /// <param name="btn">The reset button</param>
         protected void OnResetBtn(IUIObject btn) {
             try {
                 if( !sortBarDisabled ) {
-                    Utilities.FixDefaultVesselCrew(vesselCrew, availableCrew, sortBar); 
+                    Utilities.AddInputDelegateToKerbals(vesselCrew, OnKerbalMouseInput);
+                    Utilities.AddInputDelegateToKerbals(availableCrew, OnKerbalMouseInput);
+                    sortBar.SortRoster();
                 }
             }
             catch( Exception e ) {
@@ -213,10 +223,7 @@ namespace KerbalSorter.Hooks {
         /// This is called when we click on a kerbal in the list, or when
         /// the red X next to a kerbal in the vessel crew is clicked.
         /// It is, unfortunately, not called when a kerbal is dragged into,
-        /// out of, or within the list. The only way to detect that is to
-        /// put an InputListener on each of those items, and that doesn't
-        /// seem to give us a hook *after* the kerbal has been placed into
-        /// the list, which means ATM we're SOL on really detecting drags.
+        /// out of, or within the list. We need other detection methods for that.
         /// <param name="obj"></param>
         protected void OnAvailListValueChanged(IUIObject obj) {
             try {
@@ -230,18 +237,37 @@ namespace KerbalSorter.Hooks {
         }
 
 
-        // Experimental:
-        /*POINTER_INFO.INPUT_EVENT lastInputEvt = POINTER_INFO.INPUT_EVENT.NO_CHANGE;
-        protected void OnInput(ref POINTER_INFO ptr) {
-            if( ptr.evt != lastInputEvt ){
-                Debug.Log("KerbalSorter: OnInput -- " + ptr.evt);
-                lastInputEvt = ptr.evt;
-            }
+        /// <summary>
+        /// Catch when we finish dragging a kerbal's entry in a list.
+        /// </summary>
+        /// We have no other way of detecting dragging, so we have to do this,
+        /// in combination with a later re-sort in the Update hook since the
+        /// mouse input comes before the kerbal is placed.
+        /// <param name="ptr">Information about the mouse input</param>
+        protected void OnKerbalMouseInput(ref POINTER_INFO ptr) {
             // Catch when the mouse finishes clicking/dragging.
             if( ptr.evt == POINTER_INFO.INPUT_EVENT.RELEASE_OFF ){
-                Debug.Log("KerbalSorter: Logged drag.");
-                sortBar.SortRoster();
+                // We can't re-sort here, so we have to signal a change for later.
+                resortAfterDrag = true;
             }
-        }*/
+        }
+
+        /// <summary>
+        /// Re-sort the list if we just finished dragging a kerbal.
+        /// </summary>
+        /// This complements the OnKerbalMouseInput hook, allowing us to re-sort
+        /// the list of available kerbals whenever we drag them. I haven't found
+        /// a better way to do that, so here we are.
+        protected void Update() {
+            try {
+                if( resortAfterDrag ) {
+                    resortAfterDrag = false;
+                    sortBar.SortRoster();
+                }
+            }
+            catch( Exception e ) {
+                Debug.LogError("KerbalSorter: Unexpected error in LaunchWindowHook: " + e);
+            }
+        }
     }
 }
