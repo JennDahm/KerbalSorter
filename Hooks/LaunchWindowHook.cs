@@ -16,7 +16,8 @@ namespace KerbalSorter.Hooks {
         bool launchScreenUp = false;
         bool sortBarDisabled = false;
 
-        bool resortAfterDrag = false;
+        bool onUpdate_ReSort = false;
+        bool onUpdate_ApplyInputListeners = false;
 
         /// <summary>
         /// Set up the Sort Bar for the Launch Windows. (Callback)
@@ -171,7 +172,11 @@ namespace KerbalSorter.Hooks {
         /// </summary>
         protected void OnACDespawn() {
             // When we come out of the AC, we may or may not be on the launch screen.
-            sortBar.enabled = launchScreenUp && !sortBarDisabled;
+            if( launchScreenUp && !sortBarDisabled ) {
+                sortBar.enabled = true;
+                // We need to reapply the input listeners, but we can't do it here.
+                onUpdate_ApplyInputListeners = true;
+            }
         }
 
 
@@ -248,7 +253,7 @@ namespace KerbalSorter.Hooks {
             // Catch when the mouse finishes clicking/dragging.
             if( ptr.evt == POINTER_INFO.INPUT_EVENT.RELEASE_OFF ){
                 // We can't re-sort here, so we have to signal a change for later.
-                resortAfterDrag = true;
+                onUpdate_ReSort = true;
             }
         }
 
@@ -260,9 +265,14 @@ namespace KerbalSorter.Hooks {
         /// a better way to do that, so here we are.
         protected void Update() {
             try {
-                if( resortAfterDrag ) {
-                    resortAfterDrag = false;
+                if( onUpdate_ReSort ) {
+                    onUpdate_ReSort = false;
                     sortBar.SortRoster();
+                }
+                if( onUpdate_ApplyInputListeners ) {
+                    onUpdate_ApplyInputListeners = false;
+                    Utilities.AddInputDelegateToKerbals(vesselCrew, OnKerbalMouseInput);
+                    Utilities.AddInputDelegateToKerbals(availableCrew, OnKerbalMouseInput);
                 }
             }
             catch( Exception e ) {
