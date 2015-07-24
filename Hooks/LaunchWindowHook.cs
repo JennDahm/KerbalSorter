@@ -61,18 +61,17 @@ namespace KerbalSorter.Hooks {
                 }
                 StockRoster available = new StockRoster(availableCrew);
 
-                // Set up button list:
-                SortButtonDef[] buttons = ButtonAndBarLoader.SortBarDefs["CrewAssign"];
+                // Get sort bar definition:
+                SortBarDef bar = ButtonAndBarLoader.SortBarDefs["CrewAssign"];
 
                 // Initialize the sort bar:
                 sortBar = gameObject.AddComponent<SortBar>();
+                sortBar.SetDefinition(bar);
                 sortBar.SetRoster(available);
-                sortBar.SetButtons(buttons);
-                sortBar.SetDefaultOrdering(StandardKerbalComparers.DefaultAvailable);
                 sortBar.enabled = false;
                 sortBarDisabled = available == null
-                               || buttons == null
-                               || buttons.Length == 0;
+                               || bar.buttons == null
+                               || bar.buttons.Length == 0;
 
 
                 // Set up some hooks to detect when the list is changing:

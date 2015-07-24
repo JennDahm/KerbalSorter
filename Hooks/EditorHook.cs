@@ -69,19 +69,18 @@ namespace KerbalSorter.Hooks {
                 float x = tabPos.x + tab.width + 5;
                 float y = tabPos.y - 1;
 
-                // Set up button list:
-                SortButtonDef[] buttons = ButtonAndBarLoader.SortBarDefs["CrewAssign"];
+                // Get sort bar definition:
+                SortBarDef bar = ButtonAndBarLoader.SortBarDefs["CrewAssign"];
 
                 // Initialize the sort bar:
                 sortBar = gameObject.AddComponent<SortBar>();
+                sortBar.SetDefinition(bar);
                 sortBar.SetRoster(available);
-                sortBar.SetButtons(buttons);
-                sortBar.SetDefaultOrdering(StandardKerbalComparers.DefaultAvailable);
                 sortBar.SetPos(x, y);
                 sortBar.enabled = false;
                 sortBarDisabled = available == null
-                               || buttons == null
-                               || buttons.Length == 0;
+                               || bar.buttons == null
+                               || bar.buttons.Length == 0;
 
                 // Create a fly-in animation for the sort bar.
                 baseX = x;

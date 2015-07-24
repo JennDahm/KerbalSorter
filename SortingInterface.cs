@@ -40,6 +40,26 @@ namespace KerbalSorter {
     }
 
     /// <summary>
+    /// A definition of a sort bar; used to set up the SortBar class.
+    /// </summary>
+    public struct SortBarDef {
+        /// <summary>
+        /// A hash uniquely identifying this sort bar definition.
+        /// </summary>
+        public string hash{ get; private set; }
+
+        /// <summary>
+        /// The KerbalComparer to base the list order on.
+        /// </summary>
+        public KerbalComparer defaultComparison;
+
+        /// <summary>
+        /// The buttons the sort bar should use.
+        /// </summary>
+        public SortButtonDef[] buttons;
+    }
+
+    /// <summary>
     /// Compares two kerbals. For use in sorting.
     /// </summary>
     /// <param name="a"></param>

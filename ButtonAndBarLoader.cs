@@ -10,6 +10,9 @@ namespace KerbalSorter {
     /// </summary>
     [KSPAddon(KSPAddon.Startup.MainMenu, true)]
     public class ButtonAndBarLoader : MonoBehaviour {
+        // =====================================================================
+        //  Interface
+        // =====================================================================
         /// <summary>
         /// All loaded sort buttons.
         /// </summary>
@@ -17,12 +20,21 @@ namespace KerbalSorter {
         /// <summary>
         /// All loaded sort bar definitions.
         /// </summary>
-        public static Dictionary<string, SortButtonDef[]> SortBarDefs { get; protected set; }
+        public static Dictionary<string, SortBarDef> SortBarDefs { get; protected set; }
 
+
+        // =====================================================================
+        //  Internals
+        // =====================================================================
+
+
+        /// <summary>
+        /// Load up all definitions on awakening.
+        /// </summary>
         protected void Awake(){
             try {
                 SortButtons = new Dictionary<string,SortButtonDef>();
-                SortBarDefs = new Dictionary<string,SortButtonDef[]>();
+                SortBarDefs = new Dictionary<string,SortBarDef>();
 
                 // Load all buttons
                 Debug.Log("KerbalSorter: Loading sort buttons from configuration...");
@@ -124,9 +136,17 @@ namespace KerbalSorter {
                         Debug.LogWarning(String.Format("KerbalSorter: SORTBAR \"{0}\" has no BUTTONs.", barName));
                     }
 
-                    List<SortButtonDef> buttonDefs = new List<SortButtonDef>();
+
+                    // The comparer can be null;
+                    // the default is StandardKerbalComparers.None
+                    string comparerRaw = barNode.GetValue("defaultComparer");
+                    KerbalComparer comparer = StandardKerbalComparers.None;
+                    if( comparerRaw != null && !comparerRaw.Trim().Equals("") ) {
+                        comparer = GetComparer(comparerRaw);
+                    }
 
                     // Parse each button
+                    List<SortButtonDef> buttonDefs = new List<SortButtonDef>();
                     for( int i = 0; i < buttonNodes.Length; i++ ) {
                         string buttonName = buttonNodes[i].GetValue("name");
                         if( buttonName == null || buttonName.Trim().Equals("") ) {
@@ -141,7 +161,11 @@ namespace KerbalSorter {
                         buttonDefs.Add(buttonDef);
                     }
 
-                    SortBarDefs.Add(barName, buttonDefs.ToArray());
+                    SortBarDef def = new SortBarDef() {
+                        buttons = buttonDefs.ToArray(),
+                        defaultComparison = comparer
+                    };
+                    SortBarDefs.Add(barName, def);
                     Debug.Log(String.Format("KerbalSorter: Loaded: \"{0}\" with {1} buttons.", barName, buttonDefs.Count));
                 }
                 catch( Exception e ) {

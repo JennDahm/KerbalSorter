@@ -16,6 +16,11 @@ namespace KerbalSorter {
         /// </summary>
         private Roster<IUIListObject> roster = null;
         /// <summary>
+        /// The base order of the roster.
+        /// </summary>
+        /// If null, no base order is set.
+        KerbalComparer defaultOrder = null;
+        /// <summary>
         /// The buttons to display.
         /// </summary>
         private SortButtonDef[] buttons = new SortButtonDef[0];
@@ -24,6 +29,11 @@ namespace KerbalSorter {
         /// </summary>
         private int[] buttonStates = new int[0];
         /// <summary>
+        /// The order in which the user selected the buttons.
+        /// </summary>
+        List<int> buttonSelectOrder = new List<int>();
+
+        /// <summary>
         /// X position on the screen.
         /// </summary>
         float x = 0;
@@ -31,6 +41,18 @@ namespace KerbalSorter {
         /// Y position on the screen.
         /// </summary>
         float y = 0;
+        /// <summary>
+        /// Is the style set up yet?
+        /// </summary>
+        bool skinSetup = false;
+        /// <summary>
+        /// Is the bar expanded?
+        /// </summary>
+        bool expanded = false;
+        /// <summary>
+        /// Have we already sorted the roster?
+        /// </summary>
+        bool sorted = false;
 
         /// <summary>
         /// The style of the displayed buttons.
@@ -40,29 +62,7 @@ namespace KerbalSorter {
         /// The style of the displayed tooltip.
         /// </summary>
         GUIStyle tooltipStyle;
-        /// <summary>
-        /// Is the style set up yet?
-        /// </summary>
-        bool skinSetup = false;
-        /// <summary>
-        /// Is the bar expanded?
-        /// </summary>
-        bool expanded = false;
 
-        /// <summary>
-        /// The order in which the user selected the buttons.
-        /// </summary>
-        List<int> buttonSelectOrder = new List<int>();
-        /// <summary>
-        /// Have we already sorted the roster?
-        /// </summary>
-        bool sorted = false;
-
-        /// <summary>
-        /// The base order of the roster.
-        /// </summary>
-        /// If null, no base order is set.
-        KerbalComparer defaultOrder = null;
 
         // Apparently we can't use constructors in Unity, so we'll have to deal with it this way:
         /// <summary>
@@ -99,6 +99,15 @@ namespace KerbalSorter {
         public void SetDefaultOrdering(KerbalComparer comp) {
             defaultOrder = comp;
             this.sorted = false;
+        }
+
+        /// <summary>
+        /// Sets the sort bar's definition, including buttons and default comparison.
+        /// </summary>
+        /// <param name="def">The SortBarDef object to define ourselves around.</param>
+        public void SetDefinition(SortBarDef def) {
+            SetButtons(def.buttons);
+            SetDefaultOrdering(def.defaultComparison);
         }
 
 

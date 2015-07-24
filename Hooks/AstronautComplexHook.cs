@@ -46,30 +46,28 @@ namespace KerbalSorter.Hooks {
                 killed = new StockRoster(killedList);
                 applicants = new StockRoster(applicantList);
 
-                // Set up button lists:
-                SortButtonDef[] buttonsAvailable  = ButtonAndBarLoader.SortBarDefs["Available"];
-                SortButtonDef[] buttonsApplicants = ButtonAndBarLoader.SortBarDefs["Applicants"];
+                // Get sort bar definitions:
+                SortBarDef barAvailable  = ButtonAndBarLoader.SortBarDefs["Available"];
+                SortBarDef barApplicants = ButtonAndBarLoader.SortBarDefs["Applicants"];
 
                 // Initialize the crew sort bar:
                 sortBarCrew = gameObject.AddComponent<SortBar>();
+                sortBarCrew.SetDefinition(barAvailable);
                 sortBarCrew.SetRoster(available);
-                sortBarCrew.SetButtons(buttonsAvailable);
-                sortBarCrew.SetDefaultOrdering(StandardKerbalComparers.DefaultAvailable);
                 sortBarCrew.enabled = false;
                 curPanel = CrewPanel.Available;
                 sortBarCrewDisabled = available == null
-                                   || buttonsAvailable == null
-                                   || buttonsAvailable.Length == 0;
+                                   || barAvailable.buttons == null
+                                   || barAvailable.buttons.Length == 0;
 
                 /// Initialize the applicant sort bar:
                 sortBarApplicants = gameObject.AddComponent<SortBar>();
+                sortBarApplicants.SetDefinition(barApplicants);
                 sortBarApplicants.SetRoster(applicants);
-                sortBarApplicants.SetButtons(buttonsApplicants);
-                sortBarApplicants.SetDefaultOrdering(StandardKerbalComparers.DefaultApplicant);
                 sortBarApplicants.enabled = false;
                 sortBarApplicantsDisabled = applicants == null
-                                         || buttonsApplicants == null
-                                         || buttonsApplicants.Length == 0;
+                                         || barApplicants.buttons == null
+                                         || barApplicants.buttons.Length == 0;
 
 
                 // Assign enable listeners to the rosters:
@@ -167,29 +165,24 @@ namespace KerbalSorter.Hooks {
                 this.curPanel = panel;
 
                 StockRoster roster = null;
-                KerbalComparer defaultOrder = null;
-                SortButtonDef[] buttons = null;
+                SortBarDef def = new SortBarDef();
                 switch( panel ) {
                     case CrewPanel.Available:
                         roster = this.available;
-                        defaultOrder = StandardKerbalComparers.DefaultAvailable;
-                        buttons = ButtonAndBarLoader.SortBarDefs["Available"];
+                        def = ButtonAndBarLoader.SortBarDefs["Available"];
                         break;
                     case CrewPanel.Assigned:
                         roster = this.assigned;
-                        defaultOrder = StandardKerbalComparers.DefaultAssigned;
-                        buttons = ButtonAndBarLoader.SortBarDefs["Assigned"];
+                        def = ButtonAndBarLoader.SortBarDefs["Assigned"];
                         break;
                     case CrewPanel.Killed:
                         roster = this.killed;
-                        defaultOrder = StandardKerbalComparers.DefaultKilled;
-                        buttons = ButtonAndBarLoader.SortBarDefs["Killed"];
+                        def = ButtonAndBarLoader.SortBarDefs["Killed"];
                         break;
                 }
+                sortBarCrew.SetDefinition(def);
                 sortBarCrew.SetRoster(roster);
-                sortBarCrew.SetButtons(buttons);
-                sortBarCrew.SetDefaultOrdering(defaultOrder);
-                sortBarCrewDisabled = roster == null || buttons == null || buttons.Length == 0;
+                sortBarCrewDisabled = roster == null || def.buttons == null || def.buttons.Length == 0;
                 sortBarCrew.enabled = !sortBarCrewDisabled;
             }
             catch( Exception e ) {
