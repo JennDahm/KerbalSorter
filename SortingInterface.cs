@@ -37,17 +37,25 @@ namespace KerbalSorter {
         /// The Comparer to use for each state of the button.
         /// </summary>
         public KerbalComparer[] comparers;
+
+        /// <summary>
+        /// Generates a fingerprint hash uniquely identifying this sort button definition.
+        /// </summary>
+        public override int GetHashCode() {
+            // TODO: Write a hashing function
+            // Must be based on # states,
+            // Should also be based on the comparers implemented,
+            // Should not be based on the hover text or icon locations.
+
+            // return numStates; // basic, though shitty, implementation.
+            return base.GetHashCode();
+        }
     }
 
     /// <summary>
     /// A definition of a sort bar; used to set up the SortBar class.
     /// </summary>
     public struct SortBarDef {
-        /// <summary>
-        /// A hash uniquely identifying this sort bar definition.
-        /// </summary>
-        public string hash{ get; private set; }
-
         /// <summary>
         /// The KerbalComparer to base the list order on.
         /// </summary>
@@ -57,6 +65,40 @@ namespace KerbalSorter {
         /// The buttons the sort bar should use.
         /// </summary>
         public SortButtonDef[] buttons;
+
+        /// <summary>
+        /// Generates a fingerprint hash uniquely identifying this sort bar definition.
+        /// </summary>
+        public override int GetHashCode() {
+            // TODO: Write a hashing function
+            // Must be based on each button
+            // Should not be based on default comparison.
+            return base.GetHashCode();
+        }
+    }
+
+    /// <summary>
+    /// The state of a sort bar; used to save/restore SortBar state.
+    /// </summary>
+    public struct SortBarState {
+        /// <summary>
+        /// The hash of the SortBarDef used to set up the SortBar whose state
+        /// we're saving.
+        /// </summary>
+        public int definitionHash;
+
+        /// <summary>
+        /// The state of each button on the bar.
+        /// </summary>
+        public int[] buttonStates;
+
+        /// <summary>
+        /// The order in which the user selected the buttons on the bar.
+        /// </summary>
+        /// Each entry in the array is an index into the list of buttons. The
+        /// order in which they appear in this array is the order in which their
+        /// comparisons should be made.
+        public int[] selectionOrder;
     }
 
     /// <summary>
