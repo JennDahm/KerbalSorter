@@ -4,6 +4,8 @@ using UnityEngine;
 using System.Linq;
 using System.Collections.Generic;
 
+using StockList = KerbalSorter.Hooks.Utilities.StockList;
+
 namespace KerbalSorter.Hooks {
     /// <summary>
     /// A hook for the Launch Windows. Started up whenever the Space Centre is loaded.
@@ -62,7 +64,7 @@ namespace KerbalSorter.Hooks {
                 StockRoster available = new StockRoster(availableCrew);
 
                 // Get sort bar definition:
-                SortBarDef bar = ButtonAndBarLoader.SortBarDefs["CrewAssign"];
+                SortBarDef bar = ButtonAndBarLoader.SortBarDefs[Utilities.GetListName(StockList.CrewAssign)];
 
                 // Initialize the sort bar:
                 sortBar = gameObject.AddComponent<SortBar>();

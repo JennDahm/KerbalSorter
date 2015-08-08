@@ -4,6 +4,8 @@ using UnityEngine;
 using System.Linq;
 using System.Collections.Generic;
 
+using StockList = KerbalSorter.Hooks.Utilities.StockList;
+
 namespace KerbalSorter.Hooks {
     /// <summary>
     /// The main hook for the Astronaut Complex. Started up whenever the Space Centre is loaded.
@@ -47,8 +49,8 @@ namespace KerbalSorter.Hooks {
                 applicants = new StockRoster(applicantList);
 
                 // Get sort bar definitions:
-                SortBarDef barAvailable  = ButtonAndBarLoader.SortBarDefs["Available"];
-                SortBarDef barApplicants = ButtonAndBarLoader.SortBarDefs["Applicants"];
+                SortBarDef barAvailable  = ButtonAndBarLoader.SortBarDefs[Utilities.GetListName(StockList.Available)];
+                SortBarDef barApplicants = ButtonAndBarLoader.SortBarDefs[Utilities.GetListName(StockList.Applicants)];
 
                 // Initialize the crew sort bar:
                 curPanel = CrewPanel.Available;
@@ -111,8 +113,8 @@ namespace KerbalSorter.Hooks {
                     y = screenPos.y - 1;
                     sortBarApplicants.SetPos(x, y);
                     sortBarApplicants.enabled = true;
-                    if( KerbalSorterStates.IsSortBarStateStored("Applicants") ) {
-                        sortBarApplicants.SetState(KerbalSorterStates.GetSortBarState("Applicants"));
+                    if( KerbalSorterStates.IsSortBarStateStored(Utilities.GetListName(StockList.Applicants)) ) {
+                        sortBarApplicants.SetState(KerbalSorterStates.GetSortBarState(Utilities.GetListName(StockList.Applicants)));
                     }
                 }
             }
@@ -173,15 +175,15 @@ namespace KerbalSorter.Hooks {
                 switch( panel ) {
                     case CrewPanel.Available:
                         roster = this.available;
-                        def = ButtonAndBarLoader.SortBarDefs["Available"];
+                        def = ButtonAndBarLoader.SortBarDefs[Utilities.GetListName(StockList.Available)];
                         break;
                     case CrewPanel.Assigned:
                         roster = this.assigned;
-                        def = ButtonAndBarLoader.SortBarDefs["Assigned"];
+                        def = ButtonAndBarLoader.SortBarDefs[Utilities.GetListName(StockList.Assigned)];
                         break;
                     case CrewPanel.Killed:
                         roster = this.killed;
-                        def = ButtonAndBarLoader.SortBarDefs["Killed"];
+                        def = ButtonAndBarLoader.SortBarDefs[Utilities.GetListName(StockList.Killed)];
                         break;
                 }
                 sortBarCrew.SetDefinition(def);
@@ -222,7 +224,7 @@ namespace KerbalSorter.Hooks {
         /// <param name="newState">The new state of the Sort Bar</param>
         protected void AppSortBarStateChanged(SortBar bar, SortBarState newState) {
             try {
-                KerbalSorterStates.SetSortBarState("Applicants", newState);
+                KerbalSorterStates.SetSortBarState(Utilities.GetListName(StockList.Applicants), newState);
             }
             catch( Exception e ) {
                 Debug.LogError("KerbalSorter: Unexpected error in AstronautComplexHook: " + e);

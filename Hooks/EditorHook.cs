@@ -4,6 +4,8 @@ using UnityEngine;
 using System.Linq;
 using System.Collections.Generic;
 
+using StockList = KerbalSorter.Hooks.Utilities.StockList;
+
 namespace KerbalSorter.Hooks {
     /// <summary>
     /// A hook for the Editors. Started up whenever an Editor is loaded.
@@ -70,7 +72,7 @@ namespace KerbalSorter.Hooks {
                 float y = tabPos.y - 1;
 
                 // Get sort bar definition:
-                SortBarDef bar = ButtonAndBarLoader.SortBarDefs["CrewAssign"];
+                SortBarDef bar = ButtonAndBarLoader.SortBarDefs[Utilities.GetListName(StockList.CrewAssign)];
 
                 // Initialize the sort bar:
                 sortBar = gameObject.AddComponent<SortBar>();

@@ -10,6 +10,60 @@ namespace KerbalSorter.Hooks {
     /// </summary>
     static class Utilities {
         /// <summary>
+        /// All SortBars we implement by default.
+        /// </summary>
+        public enum StockList {
+            Applicants,
+            Available,
+            Assigned,
+            Killed,
+            CrewAssign
+        }
+
+        /// <summary>
+        /// Get the name we use to identify each of our Sort Bars.
+        /// </summary>
+        /// <param name="list">The Sort Bar ID</param>
+        /// <returns>The name of the Sort Bar</returns>
+        public static string GetListName(StockList list) {
+            switch( list ) {
+                case StockList.Applicants:
+                    return "Applicants";
+                case StockList.Available:
+                    return "Available";
+                case StockList.Assigned:
+                    return "Assigned";
+                case StockList.Killed:
+                    return "Killed";
+                case StockList.CrewAssign:
+                    return "CrewAssign";
+                default:
+                    return "";
+            }
+        }
+
+        /// <summary>
+        /// Get the ID of the Sort Bar whose name is given.
+        /// </summary>
+        /// <param name="listName">The name of the Sort Bar</param>
+        /// <returns>The ID of the Sort Bar</returns>
+        public static StockList GetListId(string listName) {
+            if( listName == "Applicants" ) {
+                return StockList.Applicants;
+            } else if( listName == "Available" ) {
+                return StockList.Available;
+            } else if( listName == "Assigned" ) {
+                return StockList.Assigned;
+            } else if( listName == "Killed" ) {
+                return StockList.Killed;
+            } else if( listName == "CrewAssign" ) {
+                return StockList.CrewAssign;
+            } else {
+                throw new ArgumentException("Unknown list: " + listName, "listName");
+            }
+        }
+
+        /// <summary>
         /// Gets the screen position of a particular UI object whose transformation is given.
         /// </summary>
         /// <param name="trans">The transformation of the UI object to locate</param>
