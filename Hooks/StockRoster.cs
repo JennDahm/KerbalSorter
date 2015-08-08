@@ -18,7 +18,7 @@ namespace KerbalSorter.Hooks {
         /// <summary>
         /// Number of kerbals in the list.
         /// </summary>
-        public int Count {
+        public override int Count {
             get { return crew.Count; }
         }
 
@@ -28,7 +28,7 @@ namespace KerbalSorter.Hooks {
         /// Use GetKerbal() to retrieve the ProtoCrewMember in the returned item.
         /// <param name="index"></param>
         /// <returns></returns>
-        public IUIListObject GetItem(int index) {
+        public override IUIListObject GetItem(int index) {
             return crew.GetItem(index);
         }
 
@@ -36,7 +36,7 @@ namespace KerbalSorter.Hooks {
         /// Removes the kerbal at the given index.
         /// </summary>
         /// <param name="index"></param>
-        public void RemoveItem(int index) {
+        public override void RemoveItem(int index) {
             crew.RemoveItem(index, false);
         }
 
@@ -45,7 +45,7 @@ namespace KerbalSorter.Hooks {
         /// </summary>
         /// <param name="item">The IUIListObject representing the kerbal</param>
         /// <param name="index"></param>
-        public void InsertItem(IUIListObject item, int index) {
+        public override void InsertItem(IUIListObject item, int index) {
             crew.InsertItem(item, index);
         }
 
@@ -54,7 +54,7 @@ namespace KerbalSorter.Hooks {
         /// </summary>
         /// <param name="item"></param>
         /// <returns></returns>
-        public ProtoCrewMember GetKerbal(IUIListObject item) {
+        public override ProtoCrewMember GetKerbal(IUIListObject item) {
             return item.gameObject.GetComponent<CrewItemContainer>().GetCrewRef();
         }
     }

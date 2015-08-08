@@ -28,14 +28,20 @@ namespace KerbalSorter {
         /// Don't fire this directly -- call FireStateChanged().
         public event StateChangedHandler StateChanged;
 
+        /// <summary>
+        /// Handles a sorting event.
+        /// </summary>
+        /// <param name="criteria">The criteria to sort by</param>
+        public delegate void SortDelegate(KerbalComparer[] criteria);
+
         // Apparently we can't use constructors in Unity, so we'll have to deal with it this way:
 
         /// <summary>
-        /// Sets the roster that this Sort Bar will sort.
+        /// Sets the sort delegate used to sort kerbals.
         /// </summary>
-        /// <param name="roster">The Roster to sort</param>
-        public void SetRoster(Roster<IUIListObject> roster) {
-            this.roster = roster;
+        /// <param name="sorter">The delegate to call in order to sort</param>
+        public void SetSortDelegate(SortDelegate sorter) {
+            this.sorter = sorter;
             this.sorted = false;
         }
 
@@ -132,7 +138,7 @@ namespace KerbalSorter {
         /// </summary>
         /// <param name="force">Force re-sorting? (Default: true)</param>
         public void SortRoster(bool force = true) {
-            if( roster != null && (!sorted || force) ) {
+            if( sorter != null && (!sorted || force) ) {
                 int count = buttonSelectOrder.Count;
                 int off = 0;
                 if( defaultOrder != null ) {
@@ -147,7 +153,8 @@ namespace KerbalSorter {
                     int bIdx = buttonSelectOrder[i];
                     comparisons[i + off] = buttons[bIdx].comparers[buttonStates[bIdx]];
                 }
-                CrewSorter<IUIListObject>.SortRoster(roster, comparisons);
+
+                sorter(comparisons);
                 sorted = true;
             }
         }
@@ -158,9 +165,9 @@ namespace KerbalSorter {
         // =====================================================================
 
         /// <summary>
-        /// The Roster that we're sorting.
+        /// The delegate to call in order to sort.
         /// </summary>
-        protected Roster<IUIListObject> roster = null;
+        protected SortDelegate sorter = null;
         /// <summary>
         /// The base order of the roster.
         /// </summary>
@@ -288,49 +295,6 @@ namespace KerbalSorter {
 
             if( stateChanged ) {
                 FireStateChanged();
-            }
-        }
-    }
-
-    /// <summary>
-    /// Static class that actually does the sorting.
-    /// </summary>
-    /// <typeparam name="T">The type held in the Roster.</typeparam>
-    public static class CrewSorter<T> {
-        /// <summary>
-        /// Sorts the given Roster using the given comparison functions.
-        /// </summary>
-        /// <param name="roster">The Roster to sort</param>
-        /// <param name="comparisons">The Comparisons to use, in order of application</param>
-        public static void SortRoster(Roster<T> roster, KerbalComparer[] comparisons) {
-            //Retrieve and temporarily store the list of kerbals
-            T[] sortedRoster = new T[roster.Count];
-            for( int i = 0; i < roster.Count; i++ ) {
-                sortedRoster[i] = roster.GetItem(i);
-            }
-
-            //Run through each comparison:
-            for( int a = 0; a < comparisons.Length; a++ ) {
-                var compare = comparisons[a];
-
-                //Insertion sort, since it's stable and we don't have a large roster:
-                for( int i = 1; i < sortedRoster.Length; i++ ) {
-                    T kerbal = sortedRoster[i];
-                    int k = i;
-                    while( 0 < k && compare(roster.GetKerbal(kerbal), roster.GetKerbal(sortedRoster[k - 1])) < 0 ) {
-                        sortedRoster[k] = sortedRoster[k - 1];
-                        k--;
-                    }
-                    sortedRoster[k] = kerbal;
-                }
-            }
-
-            //Apply the new order to the roster:
-            while( roster.Count > 0 ) {
-                roster.RemoveItem(0);
-            }
-            for( int i = 0; i < sortedRoster.Length; i++ ) {
-                roster.InsertItem(sortedRoster[i], i);
             }
         }
     }

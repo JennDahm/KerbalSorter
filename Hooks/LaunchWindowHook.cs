@@ -69,7 +69,7 @@ namespace KerbalSorter.Hooks {
                 // Initialize the sort bar:
                 sortBar = gameObject.AddComponent<SortBar>();
                 sortBar.SetDefinition(bar);
-                sortBar.SetRoster(available);
+                sortBar.SetSortDelegate(available.Sort);
                 sortBar.StateChanged += SortBarStateChanged;
                 sortBar.enabled = false;
                 sortBarDisabled = available == null

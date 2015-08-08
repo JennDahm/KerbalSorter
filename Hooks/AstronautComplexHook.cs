@@ -56,7 +56,7 @@ namespace KerbalSorter.Hooks {
                 curPanel = CrewPanel.Available;
                 sortBarCrew = gameObject.AddComponent<SortBar>();
                 sortBarCrew.SetDefinition(barAvailable);
-                sortBarCrew.SetRoster(available);
+                sortBarCrew.SetSortDelegate(available.Sort);
                 sortBarCrew.StateChanged += CrewSortBarStateChanged;
                 sortBarCrew.enabled = false;
                 sortBarCrewDisabled = available == null
@@ -66,7 +66,7 @@ namespace KerbalSorter.Hooks {
                 /// Initialize the applicant sort bar:
                 sortBarApplicants = gameObject.AddComponent<SortBar>();
                 sortBarApplicants.SetDefinition(barApplicants);
-                sortBarApplicants.SetRoster(applicants);
+                sortBarApplicants.SetSortDelegate(applicants.Sort);
                 sortBarApplicants.StateChanged += AppSortBarStateChanged;
                 sortBarApplicants.enabled = false;
                 sortBarApplicantsDisabled = applicants == null
@@ -179,27 +179,27 @@ namespace KerbalSorter.Hooks {
                 this.curPanel = panel;
 
                 string name = GetSortBarName(panel);
-                StockRoster roster = null;
+                SortBar.SortDelegate sorter = null;
                 switch( panel ) {
                     case CrewPanel.Available:
-                        roster = this.available;
+                        sorter = this.available.Sort;
                         break;
                     case CrewPanel.Assigned:
-                        roster = this.assigned;
+                        sorter = this.assigned.Sort;
                         break;
                     case CrewPanel.Killed:
-                        roster = this.killed;
+                        sorter = this.killed.Sort;
                         break;
                 }
 
                 SortBarDef def = ButtonAndBarLoader.SortBarDefs[name];
                 sortBarCrew.SetDefinition(def);
-                sortBarCrew.SetRoster(roster);
+                sortBarCrew.SetSortDelegate(sorter);
                 if( KerbalSorterStates.IsSortBarStateStored(name) ) {
                     sortBarCrew.SetState(KerbalSorterStates.GetSortBarState(name));
                 }
 
-                sortBarCrewDisabled = roster == null || def.buttons == null || def.buttons.Length == 0;
+                sortBarCrewDisabled = sorter == null || def.buttons == null || def.buttons.Length == 0;
                 sortBarCrew.enabled = !sortBarCrewDisabled;
             }
             catch( Exception e ) {

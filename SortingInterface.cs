@@ -8,13 +8,49 @@ namespace KerbalSorter {
     /// An interface to a generic roster of Kerbals.
     /// </summary>
     /// <typeparam name="T">The type contained in the Roster</typeparam>
-    public interface Roster<T> {
-        int Count { get; }
-        T GetItem(int index);
-        void RemoveItem(int index);
-        void InsertItem(T item, int index);
+    public abstract class Roster<T> {
+        public abstract int Count { get; }
+        public abstract T GetItem(int index);
+        public abstract void RemoveItem(int index);
+        public abstract void InsertItem(T item, int index);
 
-        ProtoCrewMember GetKerbal(T item);
+        public abstract ProtoCrewMember GetKerbal(T item);
+
+        /// <summary>
+        /// Sorts this Roster using the given comparison functions.
+        /// </summary>
+        /// <param name="comparisons">The Comparisons to use, in order of application</param>
+        public virtual void Sort(KerbalComparer[] comparisons) {
+            //Retrieve and temporarily store the list of kerbals
+            T[] sortedRoster = new T[this.Count];
+            for( int i = 0; i < this.Count; i++ ) {
+                sortedRoster[i] = this.GetItem(i);
+            }
+
+            //Run through each comparison:
+            for( int a = 0; a < comparisons.Length; a++ ) {
+                var compare = comparisons[a];
+
+                //Insertion sort, since it's stable and we don't have a large roster:
+                for( int i = 1; i < sortedRoster.Length; i++ ) {
+                    T kerbal = sortedRoster[i];
+                    int k = i;
+                    while( 0 < k && compare(this.GetKerbal(kerbal), this.GetKerbal(sortedRoster[k - 1])) < 0 ) {
+                        sortedRoster[k] = sortedRoster[k - 1];
+                        k--;
+                    }
+                    sortedRoster[k] = kerbal;
+                }
+            }
+
+            //Apply the new order to the roster:
+            while( this.Count > 0 ) {
+                this.RemoveItem(0);
+            }
+            for( int i = 0; i < sortedRoster.Length; i++ ) {
+                this.InsertItem(sortedRoster[i], i);
+            }
+        }
     }
 
     /// <summary>
