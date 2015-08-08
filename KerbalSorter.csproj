@@ -48,6 +48,7 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="KerbalSorterStates.cs" />
     <Compile Include="Hooks\AstronautComplexHook.cs" />
     <Compile Include="ButtonAndBarLoader.cs" />
     <Compile Include="Hooks\EditorHook.cs" />

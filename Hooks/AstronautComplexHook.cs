@@ -51,11 +51,11 @@ namespace KerbalSorter.Hooks {
                 SortBarDef barApplicants = ButtonAndBarLoader.SortBarDefs["Applicants"];
 
                 // Initialize the crew sort bar:
+                curPanel = CrewPanel.Available;
                 sortBarCrew = gameObject.AddComponent<SortBar>();
                 sortBarCrew.SetDefinition(barAvailable);
                 sortBarCrew.SetRoster(available);
                 sortBarCrew.enabled = false;
-                curPanel = CrewPanel.Available;
                 sortBarCrewDisabled = available == null
                                    || barAvailable.buttons == null
                                    || barAvailable.buttons.Length == 0;
@@ -64,6 +64,7 @@ namespace KerbalSorter.Hooks {
                 sortBarApplicants = gameObject.AddComponent<SortBar>();
                 sortBarApplicants.SetDefinition(barApplicants);
                 sortBarApplicants.SetRoster(applicants);
+                sortBarApplicants.StateChanged += AppSortBarStateChanged;
                 sortBarApplicants.enabled = false;
                 sortBarApplicantsDisabled = applicants == null
                                          || barApplicants.buttons == null
@@ -109,7 +110,10 @@ namespace KerbalSorter.Hooks {
                     x = screenPos.x + targetTab2.width + 5;
                     y = screenPos.y - 1;
                     sortBarApplicants.SetPos(x, y);
-                    sortBarApplicants.enabled = true; 
+                    sortBarApplicants.enabled = true;
+                    if( KerbalSorterStates.IsSortBarStateStored("Applicants") ) {
+                        sortBarApplicants.SetState(KerbalSorterStates.GetSortBarState("Applicants"));
+                    }
                 }
             }
             catch( Exception e ) {
@@ -209,6 +213,20 @@ namespace KerbalSorter.Hooks {
         /// </summary>
         protected void OnTabKilled() {
             OnTabSwitch(CrewPanel.Killed);
+        }
+
+        /// <summary>
+        /// Save the applicant Sort Bar's state whenever it changes. (Callback)
+        /// </summary>
+        /// <param name="bar">The applicant Sort Bar</param>
+        /// <param name="newState">The new state of the Sort Bar</param>
+        protected void AppSortBarStateChanged(SortBar bar, SortBarState newState) {
+            try {
+                KerbalSorterStates.SetSortBarState("Applicants", newState);
+            }
+            catch( Exception e ) {
+                Debug.LogError("KerbalSorter: Unexpected error in AstronautComplexHook: " + e);
+            }
         }
 
         /// <summary>
