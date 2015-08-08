@@ -70,6 +70,7 @@ namespace KerbalSorter.Hooks {
                 sortBar = gameObject.AddComponent<SortBar>();
                 sortBar.SetDefinition(bar);
                 sortBar.SetRoster(available);
+                sortBar.StateChanged += SortBarStateChanged;
                 sortBar.enabled = false;
                 sortBarDisabled = available == null
                                || bar.buttons == null
@@ -105,6 +106,21 @@ namespace KerbalSorter.Hooks {
             }
         }
 
+        /// <summary>
+        /// Save the Sort Bar's state whenever it changes. (Callback)
+        /// </summary>
+        /// <param name="bar">The Sort Bar</param>
+        /// <param name="newState">The new state of the Sort Bar</param>
+        protected void SortBarStateChanged(SortBar bar, SortBarState newState) {
+            try {
+                KerbalSorterStates.SetSortBarState(Utilities.GetListName(StockList.CrewAssign), newState);
+            }
+            catch( Exception e ) {
+                Debug.LogError("KerbalSorter: Unexpected error in LaunchWindowHook: " + e);
+            }
+        }
+
+
         // ====================================================================
         //  Game Event Hooks
         // ====================================================================
@@ -123,6 +139,11 @@ namespace KerbalSorter.Hooks {
                 float x = tabPos.x + tab.width + 5;
                 float y = tabPos.y - 1;
                 sortBar.SetPos(x, y);
+
+                string name = Utilities.GetListName(StockList.CrewAssign);
+                if( KerbalSorterStates.IsSortBarStateStored(name) ) {
+                    sortBar.SetState(KerbalSorterStates.GetSortBarState(name));
+                }
 
                 sortBar.enabled = !sortBarDisabled;
                 launchScreenUp = true;

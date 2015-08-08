@@ -79,10 +79,17 @@ namespace KerbalSorter.Hooks {
                 sortBar.SetDefinition(bar);
                 sortBar.SetRoster(available);
                 sortBar.SetPos(x, y);
+                sortBar.StateChanged += SortBarStateChanged;
                 sortBar.enabled = false;
                 sortBarDisabled = available == null
                                || bar.buttons == null
                                || bar.buttons.Length == 0;
+
+                // Load saved state: (This is probably the one time we actually want to do this here)
+                string name = Utilities.GetListName(StockList.CrewAssign);
+                if( KerbalSorterStates.IsSortBarStateStored(name) ) {
+                    sortBar.SetState(KerbalSorterStates.GetSortBarState(name));
+                }
 
                 // Create a fly-in animation for the sort bar.
                 baseX = x;
@@ -136,6 +143,20 @@ namespace KerbalSorter.Hooks {
                 GameEvents.onEditorShipModified.Remove(OnEditorShipModified);
                 GameEvents.onGUIAstronautComplexSpawn.Remove(OnACSpawn);
                 GameEvents.onGUIAstronautComplexDespawn.Remove(OnACDespawn);
+            }
+            catch( Exception e ) {
+                Debug.LogError("KerbalSorter: Unexpected error in EditorHook: " + e);
+            }
+        }
+
+        /// <summary>
+        /// Save the Sort Bar's state whenever it changes. (Callback)
+        /// </summary>
+        /// <param name="bar">The Sort Bar</param>
+        /// <param name="newState">The new state of the Sort Bar</param>
+        protected void SortBarStateChanged(SortBar bar, SortBarState newState) {
+            try {
+                KerbalSorterStates.SetSortBarState(Utilities.GetListName(StockList.CrewAssign), newState);
             }
             catch( Exception e ) {
                 Debug.LogError("KerbalSorter: Unexpected error in EditorHook: " + e);

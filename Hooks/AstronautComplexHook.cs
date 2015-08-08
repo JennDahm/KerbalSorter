@@ -57,6 +57,7 @@ namespace KerbalSorter.Hooks {
                 sortBarCrew = gameObject.AddComponent<SortBar>();
                 sortBarCrew.SetDefinition(barAvailable);
                 sortBarCrew.SetRoster(available);
+                sortBarCrew.StateChanged += CrewSortBarStateChanged;
                 sortBarCrew.enabled = false;
                 sortBarCrewDisabled = available == null
                                    || barAvailable.buttons == null
@@ -105,6 +106,11 @@ namespace KerbalSorter.Hooks {
                 sortBarCrew.SetPos(x, y);
                 sortBarCrew.enabled = !sortBarCrewDisabled;
 
+                string name = GetSortBarName(curPanel);
+                if( KerbalSorterStates.IsSortBarStateStored(name) ) {
+                    sortBarCrew.SetState(KerbalSorterStates.GetSortBarState(name));
+                }
+
                 if( !sortBarApplicantsDisabled ) {
                     targetTabTrans = complex.transform.Find("CrewPanels/panel_applicants/tab_crew");
                     BTButton targetTab2 = targetTabTrans.GetComponent<BTButton>(); // Because consistancy is not their strong suit.
@@ -113,8 +119,10 @@ namespace KerbalSorter.Hooks {
                     y = screenPos.y - 1;
                     sortBarApplicants.SetPos(x, y);
                     sortBarApplicants.enabled = true;
-                    if( KerbalSorterStates.IsSortBarStateStored(Utilities.GetListName(StockList.Applicants)) ) {
-                        sortBarApplicants.SetState(KerbalSorterStates.GetSortBarState(Utilities.GetListName(StockList.Applicants)));
+
+                    name = Utilities.GetListName(StockList.Applicants);
+                    if( KerbalSorterStates.IsSortBarStateStored(name) ) {
+                        sortBarApplicants.SetState(KerbalSorterStates.GetSortBarState(name));
                     }
                 }
             }
@@ -170,24 +178,27 @@ namespace KerbalSorter.Hooks {
                 }
                 this.curPanel = panel;
 
+                string name = GetSortBarName(panel);
                 StockRoster roster = null;
-                SortBarDef def = new SortBarDef();
                 switch( panel ) {
                     case CrewPanel.Available:
                         roster = this.available;
-                        def = ButtonAndBarLoader.SortBarDefs[Utilities.GetListName(StockList.Available)];
                         break;
                     case CrewPanel.Assigned:
                         roster = this.assigned;
-                        def = ButtonAndBarLoader.SortBarDefs[Utilities.GetListName(StockList.Assigned)];
                         break;
                     case CrewPanel.Killed:
                         roster = this.killed;
-                        def = ButtonAndBarLoader.SortBarDefs[Utilities.GetListName(StockList.Killed)];
                         break;
                 }
+
+                SortBarDef def = ButtonAndBarLoader.SortBarDefs[name];
                 sortBarCrew.SetDefinition(def);
                 sortBarCrew.SetRoster(roster);
+                if( KerbalSorterStates.IsSortBarStateStored(name) ) {
+                    sortBarCrew.SetState(KerbalSorterStates.GetSortBarState(name));
+                }
+
                 sortBarCrewDisabled = roster == null || def.buttons == null || def.buttons.Length == 0;
                 sortBarCrew.enabled = !sortBarCrewDisabled;
             }
@@ -229,6 +240,33 @@ namespace KerbalSorter.Hooks {
             catch( Exception e ) {
                 Debug.LogError("KerbalSorter: Unexpected error in AstronautComplexHook: " + e);
             }
+        }
+
+        /// <summary>
+        /// Save the crew Sort Bar's state whenever it changes. (Callback)
+        /// </summary>
+        /// <param name="bar">The crew Sort Bar</param>
+        /// <param name="newState">The new state of the Sort Bar</param>
+        protected void CrewSortBarStateChanged(SortBar bar, SortBarState newState) {
+            try {
+                string name = GetSortBarName(curPanel);
+                KerbalSorterStates.SetSortBarState(name, newState);
+            }
+            catch( Exception e ) {
+                Debug.LogError("KerbalSorter: Unexpected error in AstronautComplexHook: " + e);
+            }
+        }
+
+        protected string GetSortBarName(CrewPanel panel) {
+            switch( panel ) {
+                case CrewPanel.Available:
+                    return Utilities.GetListName(StockList.Available);
+                case CrewPanel.Assigned:
+                    return Utilities.GetListName(StockList.Assigned);
+                case CrewPanel.Killed:
+                    return Utilities.GetListName(StockList.Killed);
+            }
+            return "";
         }
 
         /// <summary>
