@@ -14,6 +14,7 @@ namespace KerbalSorter {
         // =====================================================================
         //  Interface
         // =====================================================================
+
         /// <summary>
         /// Handles when a SortBar changes its state.
         /// </summary>
@@ -155,6 +156,7 @@ namespace KerbalSorter {
         // =====================================================================
         //  Internals
         // =====================================================================
+
         /// <summary>
         /// The Roster that we're sorting.
         /// </summary>
@@ -240,10 +242,10 @@ namespace KerbalSorter {
                 buttonStyle.padding = new RectOffset(4, 4, 4, 4);
                 skinSetup = true;
                 tooltipStyle = new GUIStyle(GUI.skin.textField);
-                tooltipStyle.padding.top += 2;
+                tooltipStyle.padding.top    += 2;
                 tooltipStyle.padding.bottom += 2;
-                tooltipStyle.padding.left += 2;
-                tooltipStyle.padding.right += 2;
+                tooltipStyle.padding.left   += 2;
+                tooltipStyle.padding.right  += 2;
             }
 
             Texture buttonIcon = GameDatabase.Instance.GetTexture("KerbalSorter/Images/" + (expanded ? "SortBtnIn" : "SortBtnOut"), false);

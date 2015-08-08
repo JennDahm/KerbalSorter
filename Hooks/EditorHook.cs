@@ -144,7 +144,7 @@ namespace KerbalSorter.Hooks {
         // ====================================================================
         //  Game Event Hooks
         // ====================================================================
-        
+
         /// <summary>
         /// Enable the sort bar when we switch to the Crew AssignmentPanel; disable it when we switch out. (Callback)
         /// </summary>
@@ -258,7 +258,7 @@ namespace KerbalSorter.Hooks {
         protected void OnClearBtn(IUIObject btn) {
             try {
                 if( !sortBarDisabled ) {
-                    sortBar.SortRoster(); 
+                    sortBar.SortRoster();
                 }
             }
             catch( Exception e ) {
@@ -292,7 +292,7 @@ namespace KerbalSorter.Hooks {
                 if( !sortBarDisabled ) {
                     Utilities.AddInputDelegateToKerbals(vesselCrew, OnKerbalMouseInput);
                     Utilities.AddInputDelegateToKerbals(availableCrew, OnKerbalMouseInput);
-                    sortBar.SortRoster(); 
+                    sortBar.SortRoster();
                 }
             }
             catch( Exception e ) {
@@ -311,7 +311,7 @@ namespace KerbalSorter.Hooks {
         protected void OnAvailListValueChanged(IUIObject obj) {
             try {
                 if( !sortBarDisabled ) {
-                    sortBar.SortRoster(); 
+                    sortBar.SortRoster();
                 }
             }
             catch( Exception e ) {

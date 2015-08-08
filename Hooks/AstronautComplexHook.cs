@@ -77,8 +77,8 @@ namespace KerbalSorter.Hooks {
                 Utilities.AddOnEnableListener(killedList.gameObject, OnTabKilled, true);
 
                 // There's no other way to detect KSI's presence, unfortunately. :/
-                foreach( AssemblyLoader.LoadedAssembly asm in AssemblyLoader.loadedAssemblies ){
-                    if( asm.dllName == "KSI" ){
+                foreach( AssemblyLoader.LoadedAssembly asm in AssemblyLoader.loadedAssemblies ) {
+                    if( asm.dllName == "KSI" ) {
                         sortBarApplicantsDisabled = true;
                     }
                 }

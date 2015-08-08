@@ -13,10 +13,12 @@ namespace KerbalSorter {
         // =====================================================================
         //  Interface
         // =====================================================================
+
         /// <summary>
         /// All loaded sort buttons.
         /// </summary>
         public static Dictionary<string, SortButtonDef> SortButtons { get; protected set; }
+
         /// <summary>
         /// All loaded sort bar definitions.
         /// </summary>
@@ -27,14 +29,13 @@ namespace KerbalSorter {
         //  Internals
         // =====================================================================
 
-
         /// <summary>
         /// Load up all definitions on awakening.
         /// </summary>
-        protected void Awake(){
+        protected void Awake() {
             try {
-                SortButtons = new Dictionary<string,SortButtonDef>();
-                SortBarDefs = new Dictionary<string,SortBarDef>();
+                SortButtons = new Dictionary<string, SortButtonDef>();
+                SortBarDefs = new Dictionary<string, SortBarDef>();
 
                 // Load all buttons
                 Debug.Log("KerbalSorter: Loading sort buttons from configuration...");
@@ -129,7 +130,7 @@ namespace KerbalSorter {
                         barName = null;
                         throw new ArgumentNullException("name", "The name field of a SORTBAR must exist and be non-empty.");
                     }
-                    
+
                     ConfigNode[] buttonNodes = barNode.GetNodes("BUTTON");
                     if( buttonNodes == null || buttonNodes.Length == 0 ) {
                         buttonNodes = new ConfigNode[0];
@@ -187,7 +188,7 @@ namespace KerbalSorter {
         /// <returns>The KerbalComparer referenced, or StandardKerbalComparers.None if something went wrong</returns>
         protected static KerbalComparer GetComparer(string name) {
             int separatorIdx = name.LastIndexOf('.');
-            if( separatorIdx < 0 ){
+            if( separatorIdx < 0 ) {
                 Debug.LogWarning(String.Format("KerbalSorter: \"{0}\" is not valid. You must provide a fully qualified static method name.", name));
             }
             string className  = name.Substring(0, separatorIdx);
@@ -207,7 +208,7 @@ namespace KerbalSorter {
             // have == defined for Type. Most of us compiling this will have a
             // later version of .NET that does, which then confuses KSP because
             // it encounters a reference to a method it doesn't recognize.
-            if( ((object)type) == null ){
+            if( ((object)type) == null ) {
                 Debug.LogWarning(String.Format("KerbalSorter: Could not find class \"{0}\".", className));
                 return StandardKerbalComparers.None;
             }

@@ -213,7 +213,7 @@ namespace KerbalSorter.Hooks {
         protected void OnClearBtn(IUIObject btn) {
             try {
                 if( !sortBarDisabled ) {
-                    sortBar.SortRoster(); 
+                    sortBar.SortRoster();
                 }
             }
             catch( Exception e ) {
@@ -232,7 +232,7 @@ namespace KerbalSorter.Hooks {
         protected void OnAvailListValueChanged(IUIObject obj) {
             try {
                 if( !sortBarDisabled ) {
-                    sortBar.SortRoster(); 
+                    sortBar.SortRoster();
                 }
             }
             catch( Exception e ) {
@@ -250,7 +250,7 @@ namespace KerbalSorter.Hooks {
         /// <param name="ptr">Information about the mouse input</param>
         protected void OnKerbalMouseInput(ref POINTER_INFO ptr) {
             // Catch when the mouse finishes clicking/dragging.
-            if( ptr.evt == POINTER_INFO.INPUT_EVENT.RELEASE_OFF ){
+            if( ptr.evt == POINTER_INFO.INPUT_EVENT.RELEASE_OFF ) {
                 // We can't re-sort here, so we have to signal a change for later.
                 onUpdate_ReSort = true;
             }

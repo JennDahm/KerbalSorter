@@ -189,7 +189,7 @@ namespace KerbalSorter {
         static public int LevelDescending(ProtoCrewMember a, ProtoCrewMember b) {
             return -LevelAscending(a, b);
         }
-        
+
         /// <summary>
         /// Sorts by gender, male first; <see cref="KerbalSorter.KerbalComparer(ProtoCrewMember,ProtoCrewMember)"/>.
         /// </summary>
@@ -257,12 +257,10 @@ namespace KerbalSorter {
             }
             KerbalRoster roster = HighLogic.CurrentGame.CrewRoster;
             foreach( ProtoCrewMember kerbal in roster.Applicants ) {
-                if( kerbal == a )
-                    return -1;
-                if( kerbal == b )
-                    return 1;
+                if( kerbal == a ) return -1;
+                if( kerbal == b ) return 1;
             }
-            // Uuuuum, neither are in the roster?
+            // Uuuuum, neither are applicants?
             return 0;
         }
 
@@ -282,10 +280,8 @@ namespace KerbalSorter {
             }
             foreach( ProtoVessel vessel in HighLogic.CurrentGame.flightState.protoVessels ) {
                 foreach( ProtoCrewMember kerbal in vessel.GetVesselCrew() ) {
-                    if( kerbal == a )
-                        return -1;
-                    if( kerbal == b )
-                        return 1;
+                    if( kerbal == a ) return -1;
+                    if( kerbal == b ) return 1;
                 }
             }
             // Uuuuum, neither are assigned?
@@ -301,7 +297,7 @@ namespace KerbalSorter {
         /// which they were hired.
         static public int DefaultKilled(ProtoCrewMember a, ProtoCrewMember b) {
             // Apparently Killed kerbals appear in the same order they would be if they were available.
-            return DefaultAvailable(a,b);
+            return DefaultAvailable(a, b);
         }
     }
 }
