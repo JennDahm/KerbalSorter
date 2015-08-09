@@ -1,7 +1,7 @@
 # KerbalSorter 1.0 (In Progress)
 A mod for Kerbal Space Program that allows players to sort their crew rosters.
 
-This mod adds a small toolbar to every crew roster in the game outside of flight mode for sorting your kerbals! Currently supported sorting criterion are:
+This mod adds a small toolbar to every crew roster in the game outside of flight mode for sorting your kerbals! Currently supported sorting criteria are:
 
 * Name
 * Class
@@ -29,8 +29,7 @@ This mod includes version checking using [Mini-AVC.](http://forum.kerbalspacepro
 
 ## Bugs
 
-These are the known bugs at the moment. Please file an issue if you find another one!
-* In the Launch Windows and Editors, when dragging and dropping a kerbal into the list of available crew, the kerbal is not sorted back into the available list. I seem to have no way to detect when this is done, nor any way to disable it. If you drag and drop your kerbals, you can click on one of the kerbals in the available list to re-sort them.
+These are no known bugs at the moment. Please file an issue if you find one!
 
 
 ## How to Contribute

@@ -17,12 +17,12 @@ namespace KerbalSorter {
         /// </summary>
         /// <param name="name">The name of the Sort Bar whose state was set</param>
         /// <param name="newState">The new state of the Sort Bar</param>
-        public delegate void SortBarStateSetHandler(string name, SortBarState newState);
+        public delegate void SortBarStateChangedHandler(string name, SortBarState newState);
 
         /// <summary>
-        /// Fires whenever a Sort Bar's state is set within this class.
+        /// Fires whenever a Sort Bar's state is changed within this class.
         /// </summary>
-        public static event SortBarStateSetHandler SortBarStateSet;
+        public static event SortBarStateChangedHandler SortBarStateChanged;
 
         /// <summary>
         /// Checks whether a state is stored with the given name.
@@ -50,8 +50,8 @@ namespace KerbalSorter {
         /// <param name="state">The state of the Sort Bar</param>
         public static void SetSortBarState(string name, SortBarState state) {
             SortBarStates[name] = state;
-            if( SortBarStateSet != null ) {
-                SortBarStateSet(name, state);
+            if( SortBarStateChanged != null ) {
+                SortBarStateChanged(name, state);
             }
         }
 

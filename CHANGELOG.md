@@ -1,4 +1,13 @@
-#### v0.4
+#### v1.0
+Out of beta!
+* First release on CKAN
+* Finalized extension API.
+* Added support for AVC
+* Added ModuleManager compatible config files for sort bar and button definitions.
+* Added saving/loading capability to all sort bars.
+* Fixed bug where dragging kerbals in the Editors and Launch Windows would mess up the sorted order.
+
+#### v0.4 Beta
 * Added tab-switch handling to Astronaut Complex.
 * Added tool-tips to every button.
 * Added SortBar to Applicants panel, with compatibility for OakTree42's KSI-Hiring mod.

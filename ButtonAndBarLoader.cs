@@ -17,7 +17,7 @@ namespace KerbalSorter {
         /// <summary>
         /// All loaded sort buttons.
         /// </summary>
-        public static Dictionary<string, SortButtonDef> SortButtons { get; protected set; }
+        public static Dictionary<string, SortButtonDef> SortButtonDefs { get; protected set; }
 
         /// <summary>
         /// All loaded sort bar definitions.
@@ -34,7 +34,7 @@ namespace KerbalSorter {
         /// </summary>
         protected void Awake() {
             try {
-                SortButtons = new Dictionary<string, SortButtonDef>();
+                SortButtonDefs = new Dictionary<string, SortButtonDef>();
                 SortBarDefs = new Dictionary<string, SortBarDef>();
 
                 // Load all buttons
@@ -52,7 +52,7 @@ namespace KerbalSorter {
         }
 
         /// <summary>
-        /// Parses all SORTBUTTON ConfigNodes and saves them in this.SortButtons.
+        /// Parses all SORTBUTTON ConfigNodes and saves them in this.SortButtonDefs.
         /// </summary>
         /// All ConfigNodes are accessed after ModuleManager has modified them.
         protected void ParseSortButtons() {
@@ -101,7 +101,7 @@ namespace KerbalSorter {
                         buttonDef.comparers[i] = GetComparer(comparerRaw);
                     }
 
-                    SortButtons.Add(buttonName, buttonDef);
+                    SortButtonDefs.Add(buttonName, buttonDef);
                     Debug.Log(String.Format("KerbalSorter: Loaded: \"{0}\" with {1} states.", buttonName, stateNodes.Length));
                 }
                 catch( Exception e ) {
@@ -154,11 +154,11 @@ namespace KerbalSorter {
                             Debug.LogWarning(String.Format("KerbalSorter: In SORTBAR \"{0}\": BUTTON {1} has no name. Omitting.", barName, i));
                             continue;
                         }
-                        if( !SortButtons.ContainsKey(buttonName) ) {
+                        if( !SortButtonDefs.ContainsKey(buttonName) ) {
                             Debug.LogWarning(String.Format("KerbalSorter: In SORTBAR \"{0}\": BUTTON {1} doesn't exist. Omitting.", barName, buttonName));
                             continue;
                         }
-                        SortButtonDef buttonDef = SortButtons[buttonName];
+                        SortButtonDef buttonDef = SortButtonDefs[buttonName];
                         buttonDefs.Add(buttonDef);
                     }
 
