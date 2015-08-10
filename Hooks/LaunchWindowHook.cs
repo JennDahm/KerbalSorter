@@ -142,7 +142,13 @@ namespace KerbalSorter.Hooks {
 
                 string name = Utilities.GetListName(StockList.CrewAssign);
                 if( KerbalSorterStates.IsSortBarStateStored(name) ) {
-                    sortBar.SetState(KerbalSorterStates.GetSortBarState(name));
+                    try {
+                        sortBar.SetState(KerbalSorterStates.GetSortBarState(name));
+                    }
+                    catch( ArgumentException e ) {
+                        Debug.LogException(e);
+                        sortBar.Reset(true);
+                    }
                 }
 
                 sortBar.enabled = !sortBarDisabled;

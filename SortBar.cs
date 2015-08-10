@@ -50,10 +50,8 @@ namespace KerbalSorter {
         /// </summary>
         /// <param name="buttons">The list of button definitions to use</param>
         public void SetButtons(SortButtonDef[] buttons) {
-            this.buttons = buttons;
-            this.buttonStates = new int[buttons.Length];
-            this.buttonSelectOrder.Clear();
-            this.sorted = false;
+            this.def.buttons = buttons;
+            this.Reset(false);
         }
 
         /// <summary>
@@ -71,26 +69,35 @@ namespace KerbalSorter {
         /// </summary>
         /// <param name="comp">The function defining the base ordering</param>
         public void SetDefaultOrdering(KerbalComparer comp) {
-            defaultOrder = comp;
+            this.def.defaultComparison = comp;
             this.sorted = false;
         }
 
         /// <summary>
-        /// Sets the sort bar's definition, including buttons and default comparison.
+        /// Gets this SortBar's definition.
         /// </summary>
-        /// <param name="def">The SortBarDef object to define ourselves around.</param>
-        public void SetDefinition(SortBarDef def) {
-            SetButtons(def.buttons);
-            SetDefaultOrdering(def.defaultComparison);
+        /// <returns></returns>
+        public SortBarDef GetDefinition() {
+            return this.def;
         }
 
         /// <summary>
-        /// Gets a copy of the SortBar's current state.
+        /// Sets this SortBar's definition, including buttons and default comparison.
         /// </summary>
-        /// <returns>a copy of the SortBar's current state</returns>
+        /// <param name="def">The SortBarDef object to define ourselves around.</param>
+        public void SetDefinition(SortBarDef def) {
+            this.def = def;
+            this.Reset(false);
+        }
+
+        /// <summary>
+        /// Gets this SortBar's current state.
+        /// </summary>
+        /// <returns></returns>
         public SortBarState GetState() {
             return new SortBarState() {
-                buttonStates = (int[])this.buttonStates.Clone(),
+                definitionHash = this.def.GetHashCode(),
+                buttonStates = this.buttonStates,
                 selectionOrder = this.buttonSelectOrder.ToArray()
             };
         }
@@ -101,16 +108,10 @@ namespace KerbalSorter {
         /// <param name="state">The state to put the SortBar in</param>
         /// <param name="fireEvent">Whether to fire the StateChanged event (default=false)</param>
         /// <exception cref="System.ArgumentException">Thrown if the state isn't compatible with this SortBar's definition.</exception>
-        /// If any parameter is null, the SortBar is reset as if Reset() was called.
         public void SetState(SortBarState state, bool fireEvent = false) {
-            // TODO: Better input scrubbing.
-            if( state.buttonStates == null || state.selectionOrder == null ) {
-                this.Reset(fireEvent);
-                return;
-            }
-            if( state.buttonStates.Length != this.buttons.Length ) {
-                string error = "The provided state doesn't work for this SortBar's definition!";
-                throw new ArgumentException(error, "state.buttonStates");
+            if( state.definitionHash != this.def.GetHashCode() ) {
+                string error = "The hash the state kept doesn't match this SortBar's definition!";
+                throw new ArgumentException(error, "state.definitionHash");
             }
             this.buttonStates = (int[])state.buttonStates.Clone();
             this.buttonSelectOrder = new List<int>(state.selectionOrder);
@@ -125,7 +126,7 @@ namespace KerbalSorter {
         /// </summary>
         /// <param name="fireEvent">Whether to fire the StateChanged event (default=false)</param>
         public void Reset(bool fireEvent = false) {
-            this.buttonStates = new int[this.buttons.Length];
+            this.buttonStates = new int[this.def.buttons.Length];
             this.buttonSelectOrder.Clear();
             this.sorted = false;
             if( fireEvent ) {
@@ -141,17 +142,17 @@ namespace KerbalSorter {
             if( sorter != null && (!sorted || force) ) {
                 int count = buttonSelectOrder.Count;
                 int off = 0;
-                if( defaultOrder != null ) {
+                if( def.defaultComparison != null ) {
                     count++;
                     off++;
                 }
                 KerbalComparer[] comparisons = new KerbalComparer[count];
-                if( defaultOrder != null ) {
-                    comparisons[0] = defaultOrder;
+                if( def.defaultComparison != null ) {
+                    comparisons[0] = def.defaultComparison;
                 }
                 for( int i = 0; i < buttonSelectOrder.Count; i++ ) {
                     int bIdx = buttonSelectOrder[i];
-                    comparisons[i + off] = buttons[bIdx].comparers[buttonStates[bIdx]];
+                    comparisons[i + off] = def.buttons[bIdx].comparers[buttonStates[bIdx]];
                 }
 
                 sorter(comparisons);
@@ -169,14 +170,9 @@ namespace KerbalSorter {
         /// </summary>
         protected SortDelegate sorter = null;
         /// <summary>
-        /// The base order of the roster.
+        /// The defining values of the SortBar; its buttons and default order.
         /// </summary>
-        /// If null, no base order is set.
-        protected KerbalComparer defaultOrder = null;
-        /// <summary>
-        /// The buttons to display.
-        /// </summary>
-        protected SortButtonDef[] buttons = new SortButtonDef[0];
+        protected SortBarDef def;
         /// <summary>
         /// Each of the buttons' states.
         /// </summary>
@@ -264,12 +260,12 @@ namespace KerbalSorter {
             if( expanded ) {
                 float nextX = x + 25;
 
-                for( int i = 0; i < buttons.Length; i++ ) {
-                    buttonIcon = GameDatabase.Instance.GetTexture(buttons[i].iconLocs[buttonStates[i]], false);
-                    hoverText = buttons[i].hoverText[buttonStates[i]];
+                for( int i = 0; i < def.buttons.Length; i++ ) {
+                    buttonIcon = GameDatabase.Instance.GetTexture(def.buttons[i].iconLocs[buttonStates[i]], false);
+                    hoverText = def.buttons[i].hoverText[buttonStates[i]];
                     bool pressed = GUI.Button(new Rect(nextX, y, 25, 25), new GUIContent(buttonIcon, hoverText), buttonStyle);
                     if( pressed ) {
-                        buttonStates[i] = (buttonStates[i] + 1) % buttons[i].numStates;
+                        buttonStates[i] = (buttonStates[i] + 1) % def.buttons[i].numStates;
                         buttonSelectOrder.Remove(i);
                         if( buttonStates[i] != 0 ) {
                             buttonSelectOrder.Add(i);

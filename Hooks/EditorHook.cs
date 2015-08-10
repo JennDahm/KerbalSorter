@@ -88,7 +88,13 @@ namespace KerbalSorter.Hooks {
                 // Load saved state: (This is probably the one time we actually want to do this here)
                 string name = Utilities.GetListName(StockList.CrewAssign);
                 if( KerbalSorterStates.IsSortBarStateStored(name) ) {
-                    sortBar.SetState(KerbalSorterStates.GetSortBarState(name));
+                    try {
+                        sortBar.SetState(KerbalSorterStates.GetSortBarState(name));
+                    }
+                    catch( ArgumentException e ) {
+                        Debug.LogException(e);
+                        sortBar.Reset(true);
+                    }
                 }
 
                 // Create a fly-in animation for the sort bar.

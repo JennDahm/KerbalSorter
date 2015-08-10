@@ -77,14 +77,50 @@ namespace KerbalSorter {
         /// <summary>
         /// Generates a fingerprint hash uniquely identifying this sort button definition.
         /// </summary>
+        /// This fingerprint:
+        /// * Must be based on # states.
+        /// * Should be based on the comparers used.
+        /// * Should be based on the order in which the states appear.
+        /// * Should not be based on the hover text or icon locations.
         public override int GetHashCode() {
-            // TODO: Write a hashing function
-            // Must be based on # states,
-            // Should also be based on the comparers implemented,
-            // Should not be based on the hover text or icon locations.
+            if( numStates == 0 || comparers == null ) {
+                return 0;
+            }
 
-            // return numStates; // basic, though shitty, implementation.
-            return base.GetHashCode();
+            // Compile all comparer names into a single string:
+            string messageStr = "";
+            for( int i = 0; i < comparers.Length; i++ ) {
+                if( i != 0 ) {
+                    messageStr += ";";
+                }
+                if( comparers[i] == null ) {
+                    messageStr += "null";
+                    continue;
+                }
+                messageStr += comparers[i].Method.Module;
+                messageStr += ":" + comparers[i].Method.DeclaringType;
+                messageStr += "." + comparers[i].Method.Name;
+            }
+
+            // Convert the string to bytes and ensure that it fits into an
+            // integer number of UInt32s:
+            byte[] messageBytes = System.Text.Encoding.UTF8.GetBytes(messageStr);
+            if( messageBytes.Length % 4 != 0 ) {
+                byte[] temp = messageBytes;
+                messageBytes = new byte[temp.Length + 4 - (temp.Length % 4)];
+                temp.CopyTo(messageBytes, 0);
+            }
+
+            // Convert the bytes to UInt32s:
+            UInt32[] message = new UInt32[messageBytes.Length / 4];
+            for( int i = 0; i < message.Length; i++ ) {
+                message[i] = (((UInt32)messageBytes[i * 4 + 0]) <<  0)
+                           | (((UInt32)messageBytes[i * 4 + 1]) <<  8)
+                           | (((UInt32)messageBytes[i * 4 + 2]) << 16)
+                           | (((UInt32)messageBytes[i * 4 + 3]) << 24);
+            }
+
+            return (int)Hooks.Utilities.Fingerprinter.FingerprintButton(message);
         }
     }
 
@@ -105,11 +141,19 @@ namespace KerbalSorter {
         /// <summary>
         /// Generates a fingerprint hash uniquely identifying this sort bar definition.
         /// </summary>
+        /// This fingerprint:
+        /// * Must be based on the buttons contained.
+        /// * Must be based on the order in which the buttons appear.
+        /// * Should not be based on default comparison function.
         public override int GetHashCode() {
-            // TODO: Write a hashing function
-            // Must be based on each button
-            // Should not be based on default comparison.
-            return base.GetHashCode();
+            if( buttons == null ) {
+                return 0;
+            }
+            UInt32[] message = new UInt32[buttons.Length];
+            for( int i = 0; i < buttons.Length; i++ ) {
+                message[i] = (UInt32)buttons[i].GetHashCode();
+            }
+            return (int)Hooks.Utilities.Fingerprinter.FingerprintBar(message);
         }
     }
 

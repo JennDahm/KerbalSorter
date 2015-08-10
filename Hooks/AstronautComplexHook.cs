@@ -108,7 +108,13 @@ namespace KerbalSorter.Hooks {
 
                 string name = GetSortBarName(curPanel);
                 if( KerbalSorterStates.IsSortBarStateStored(name) ) {
-                    sortBarCrew.SetState(KerbalSorterStates.GetSortBarState(name));
+                    try {
+                        sortBarCrew.SetState(KerbalSorterStates.GetSortBarState(name));
+                    }
+                    catch( ArgumentException e ) {
+                        Debug.LogException(e);
+                        sortBarCrew.Reset(true);
+                    }
                 }
 
                 if( !sortBarApplicantsDisabled ) {
@@ -122,7 +128,13 @@ namespace KerbalSorter.Hooks {
 
                     name = Utilities.GetListName(StockList.Applicants);
                     if( KerbalSorterStates.IsSortBarStateStored(name) ) {
-                        sortBarApplicants.SetState(KerbalSorterStates.GetSortBarState(name));
+                        try {
+                            sortBarApplicants.SetState(KerbalSorterStates.GetSortBarState(name));
+                        }
+                        catch( ArgumentException e ) {
+                            Debug.LogException(e);
+                            sortBarApplicants.Reset(true);
+                        }
                     }
                 }
             }
@@ -196,7 +208,13 @@ namespace KerbalSorter.Hooks {
                 sortBarCrew.SetDefinition(def);
                 sortBarCrew.SetSortDelegate(sorter);
                 if( KerbalSorterStates.IsSortBarStateStored(name) ) {
-                    sortBarCrew.SetState(KerbalSorterStates.GetSortBarState(name));
+                    try {
+                        sortBarCrew.SetState(KerbalSorterStates.GetSortBarState(name));
+                    }
+                    catch( ArgumentException e ) {
+                        Debug.LogException(e);
+                        sortBarCrew.Reset(true);
+                    }
                 }
 
                 sortBarCrewDisabled = sorter == null || def.buttons == null || def.buttons.Length == 0;

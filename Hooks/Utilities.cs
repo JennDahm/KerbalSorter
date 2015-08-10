@@ -247,6 +247,151 @@ namespace KerbalSorter.Hooks {
 
 
         /// <summary>
+        /// An implementation of Rabin's fingerprinting algorithm with
+        /// 32-bit fingerprints.
+        /// </summary>
+        public static class Fingerprinter {
+            // =====================================================================
+            //  Interface
+            // =====================================================================
+
+            /// <summary>
+            /// Creates a fingerprint for a bar.
+            /// </summary>
+            /// <param name="message">The bar's important parts, as an array of UInt32s</param>
+            /// <returns>The fingerprint</returns>
+            public static UInt32 FingerprintBar(UInt32[] message) {
+                return Fingerprint(message, barPoly);
+            }
+
+            /// <summary>
+            /// Creates a fingerprint for a button.
+            /// </summary>
+            /// <param name="message">The button's important parts, as an array of UInt32s</param>
+            /// <returns>The fingerprint</returns>
+            public static UInt32 FingerprintButton(UInt32[] message) {
+                return Fingerprint(message, buttonPoly);
+            }
+
+
+            // =====================================================================
+            //  Internals
+            // =====================================================================
+
+            /// <summary>
+            /// The Rabin Polynomial to use when fingerprinting buttons.
+            /// </summary>
+            private readonly static RabinPolynomial buttonPoly;
+            /// <summary>
+            /// The Rabin Polynomial to use when fingerprinting bars.
+            /// </summary>
+            private static RabinPolynomial barPoly;
+
+            /// <summary>
+            /// Static constructor.
+            /// </summary>
+            static Fingerprinter() {
+                // We need two different polynomials because we shouldn't be
+                // using a polynomial to fingerprint fingerprints that were made
+                // with the same polynomial, and fingerprinting fingerprints is
+                // exactly what we do to fingerprint bars.
+
+                // Represents the irreducible polynomial x^32 + x^31 + x^28 +
+                // x^26 + x^25 + x^24 + x^23 + x^21 + x^19 + x^18 + x^17 + x^15
+                // + x^14 + x^13 + x^11 + x^10 + x^9 + x^8 + x^5 + x^4 + x^3 +
+                // x^1 + x^0
+                buttonPoly = new RabinPolynomial(0x97AEEF3B);
+
+                // Represents the irreducible polynomial x^32 + x^29 + x^28 +
+                // x^20 + x^19 + x^17 + x^12 + x^11 + x^10 + x^9 + x^7 + x^6 +
+                // x^5 + x^1 + x^0
+                barPoly = new RabinPolynomial(0x301A1EE3);
+            }
+
+            /// <summary>
+            /// Calculates a fingerprint 
+            /// </summary>
+            /// <param name="message"></param>
+            /// <param name="poly"></param>
+            /// <returns></returns>
+            private static UInt32 Fingerprint(UInt32[] message, RabinPolynomial poly) {
+                UInt32 print = 0;
+                for( int i = 0; i < message.Length; i++ ) {
+                    print = message[i] ^ poly.ComputeXORFactor(print);
+                }
+                return print;
+            }
+
+
+            /// <summary>
+            /// A 32-bit Rabin polynomial.
+            /// </summary>
+            private sealed class RabinPolynomial {
+                /// <summary>
+                /// Initializes this object using the given irreducible polynomial of degree 32.
+                /// </summary>
+                /// <param name="poly">An irreducible polynomial of degree 32, leading coefficient not included</param>
+                public RabinPolynomial(UInt32 poly) {
+                    this.polyLCR = poly;
+                    InitTables();
+                }
+
+                /// <summary>
+                /// The irreducible polynomial we base this on, leading coefficient removed.
+                /// </summary>
+                private UInt32 polyLCR;
+
+                private UInt32[] tableA = new UInt32[256];
+                private UInt32[] tableB = new UInt32[256];
+                private UInt32[] tableC = new UInt32[256];
+                private UInt32[] tableD = new UInt32[256];
+
+                private void InitTables() {
+                    // Compute some polynomials mod P. These will help us
+                    // initialize the tables.
+                    // Each of these is a polynomial. mods[i] = x^(32 + i) mod P
+                    UInt32[] mods = new UInt32[32];
+                    //x^32 mod P = P - x^32 = polyLCR
+                    mods[0] = polyLCR;
+                    for( int i = 1; i < 32; i++ ) {
+                        // By property of modulo:
+                        // x^j mod P = x*(x^(j-1) mod P)
+                        mods[i] = mods[i - 1] << 1;
+                        // If the highest bit of mods[i-1] is 1, we need to add
+                        // polyLCR (which is done with XOR).
+                        if( (mods[i - 1] & 0x80000000) != 0 ) {
+                            mods[i] ^= polyLCR;
+                        }
+                    }
+
+                    // Calculate table values:
+                    for( int i = 0; i < 256; i++ ) {
+                        int temp = i;
+                        // Consider each bit, and add the appropriate polynomial
+                        // mod P if the bit is 1.
+                        for( int k = 0; k < 8; k++ ){
+                            if( (temp & 1) == 1 ) {
+                                tableA[i] ^= mods[k + 24];
+                                tableB[i] ^= mods[k + 16];
+                                tableC[i] ^= mods[k +  8];
+                                tableD[i] ^= mods[k +  0];
+                            }
+                            temp = temp >> 1;
+                        }
+                    }
+                }
+
+                public UInt32 ComputeXORFactor(UInt32 rolling_hash) {
+                    return tableA[(rolling_hash >> 24) & 0xFF] ^
+                           tableB[(rolling_hash >> 16) & 0xFF] ^
+                           tableC[(rolling_hash >>  8) & 0xFF] ^
+                           tableD[(rolling_hash >>  0) & 0xFF];
+                }
+            }
+        }
+
+
+        /// <summary>
         /// Returns a list of all transform objects under the given transform object.
         /// </summary>
         /// This is intended for debug and development purposes only.
